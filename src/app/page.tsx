@@ -1,3 +1,4 @@
+"use client";
 import {
   Box,
   Button,
@@ -7,10 +8,12 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { PlusIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
   return (
-    <Box>
+    <>
       <Box
         sx={{
           display: "flex",
@@ -30,9 +33,11 @@ export default function Home() {
             bg: "gray.800",
             shadow: "md",
           }}
+          onClick={() => router.push("/newentry")}
         >
-          <PlusIcon />
-          New Entry
+          <Box as="span" display="flex" alignItems="center">
+            <PlusIcon style={{ marginRight: "8px" }} /> New Entry
+          </Box>
         </Button>
       </Box>
 
@@ -41,7 +46,9 @@ export default function Home() {
           mx: "30",
           my: "10",
           p: "4",
-          boxShadow: "md",
+          boxShadow: "lg",
+          borderRadius: "20",
+          border: "1px solid",
         }}
       >
         <CardHeader fontWeight="bold" fontSize="2xl">
@@ -56,6 +63,6 @@ export default function Home() {
           </Text>
         </CardBody>
       </Card>
-    </Box>
+    </>
   );
 }

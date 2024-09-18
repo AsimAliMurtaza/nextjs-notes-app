@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { PlusIcon, BookOpenIcon, UserIcon } from "lucide-react"
+import { PlusIcon, BookOpenIcon, UserIcon } from "lucide-react";
 import {
   Button,
   Text,
@@ -33,23 +33,26 @@ export default function Header() {
       zIndex="1000"
       px={{ base: 2, lg: 4 }}
       py={4}
+      bg="white" // Added background color
     >
       <Flex align="center" justify="space-between" wrap="wrap">
-        {/* Title and Burger Menu */}
+        {/* Title and Burger Menu for Small Screens */}
         <Flex
           align="center"
-          gap={0}
           display={{ base: "flex", md: "none" }}
-          sx={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            width: "100%",
-          }}
+          justify="space-between"
+          width="100%"
         >
           <Link href="/" passHref>
             <Flex align="center" gap={2}>
-            <Box fontWeight="bold" fontSize="lg" display="flex" alignItems="center" gap="4">
-              <BookOpenIcon className="mr-8" />
+              <Box
+                fontWeight="bold"
+                fontSize="lg"
+                display="flex"
+                alignItems="center"
+                gap="4"
+              >
+                <BookOpenIcon className="mr-8" />
                 MyJournal
               </Box>
             </Flex>
@@ -57,43 +60,43 @@ export default function Header() {
           <Button
             onClick={onOpen}
             variant="outline"
-            colorScheme="white"
             size="sm"
+            bg="gray.200" // Updated button background for visibility
+            _hover={{ bg: "gray.300" }}
             aria-label="Menu"
           >
-          Menu</Button>
+            Menu
+          </Button>
         </Flex>
 
-        {/* Full Menu for larger screens */}
+        {/* Full Menu for Larger Screens */}
         <Flex
           align="center"
           gap={4}
           display={{ base: "none", md: "flex" }}
-          sx={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            width: "100%",
-          }}
+          justify="space-between"
+          width="100%"
         >
           <Link href="/" passHref>
             <Flex align="center" gap={2}>
-              <Box fontWeight="bold" fontSize="2xl" display="flex" alignItems="center" gap="4">
-              <BookOpenIcon className="mr-2" />
+              <Box
+                fontWeight="bold"
+                fontSize="2xl"
+                display="flex"
+                alignItems="center"
+                gap="4"
+              >
+                <BookOpenIcon className="mr-2" />
                 MyJournal
               </Box>
             </Flex>
           </Link>
-          
-          
-          
+
           <Menu>
-            <MenuButton
-              sx={{
-                marginRight: "5px",
-              }}
-            >
+            <MenuButton>
               <Image
                 alt="dp"
+                src="/path-to-image.jpg" // Add a valid image source
                 border="1px solid black"
                 borderRadius="full"
                 boxSize="40px"
@@ -102,28 +105,12 @@ export default function Header() {
             </MenuButton>
             <MenuList>
               <MenuItem>
-                <Button
-                  color="black"
-                  variant="ghost"
-                  w="100%"
-                  sx={{
-                    textAlign: "center",
-                    width: "100%",
-                  }}
-                >
+                <Button color="black" variant="ghost" w="100%">
                   Sign Out
                 </Button>
               </MenuItem>
               <MenuItem>
-                <Button
-                  color="black"
-                  variant="ghost"
-                  w="100%"
-                  sx={{
-                    textAlign: "center",
-                    width: "100%",
-                  }}
-                >
+                <Button color="black" variant="ghost" w="100%">
                   My Account
                 </Button>
               </MenuItem>
@@ -132,6 +119,7 @@ export default function Header() {
         </Flex>
       </Flex>
 
+      {/* Drawer for Small Screens */}
       <Drawer placement="right" onClose={onClose} isOpen={isOpen}>
         <DrawerOverlay
           sx={{
@@ -146,30 +134,17 @@ export default function Header() {
           }}
         >
           <DrawerCloseButton />
-
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 4,
-              padding: 4,
-            }}
-          >
-          </Box>
-
           <DrawerBody>
-            <Flex direction="column" gap={2}>
+            <Flex direction="column" gap={2} mt={4}>
               <Link href="/" passHref>
                 <Button
                   variant="ghost"
                   fontSize="lg"
-                  colorScheme="white"
                   w="full"
                   p="0.5rem"
                   borderRadius="lg"
                   justifyContent="flex-start"
-                  _hover={{ bg: "white", textColor : "black", cursor: "pointer" }}
+                  _hover={{ bg: "gray.100", textColor: "black" }}
                 >
                   Home
                 </Button>
@@ -178,12 +153,11 @@ export default function Header() {
                 <Button
                   variant="ghost"
                   fontSize="lg"
-                  colorScheme="white"
                   w="full"
                   p="0.5rem"
                   borderRadius="lg"
                   justifyContent="flex-start"
-                  _hover={{ bg: "white", textColor : "black", cursor: "pointer" }}
+                  _hover={{ bg: "gray.100", textColor: "black" }}
                 >
                   Account
                 </Button>
