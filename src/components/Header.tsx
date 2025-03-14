@@ -1,171 +1,129 @@
 "use client";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { PlusIcon, BookOpenIcon, UserIcon } from "lucide-react";
+
 import {
-  Button,
-  Text,
-  Box,
   Flex,
-  useDisclosure,
-  Image,
-  Drawer,
-  DrawerBody,
-  DrawerHeader,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
+  Input,
+  IconButton,
+  Avatar,
+  Spacer,
+  Box,
+  useColorModeValue,
+  Menu,
+  MenuButton,
   MenuList,
   MenuItem,
-  MenuButton,
-  Menu,
 } from "@chakra-ui/react";
+import { FiSearch, FiBell, FiUser, FiLogOut } from "react-icons/fi";
+import { useRouter } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 
-export default function Header() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+const Topbar = () => {
+  const router = useRouter();
+  const { data: session } = useSession();
+
+  const bgColor = useColorModeValue(
+    "rgba(255, 255, 255, 0.8)",
+    "rgba(26, 32, 44, 0.8)"
+  );
+  const borderColor = useColorModeValue("gray.300", "gray.700");
+  const inputBg = useColorModeValue("whiteAlpha.800", "gray.700");
+  const iconColor = useColorModeValue("gray.600", "gray.300");
+  const hoverBg = useColorModeValue("blue.100", "blue.700");
+  const menuBg = useColorModeValue("white", "gray.700");
 
   return (
-    <Box
-      as="header"
-      boxShadow="md"
-      position="fixed"
-      width="100%"
-      zIndex="1000"
-      px={{ base: 2, lg: 4 }}
-      py={4}
-      bg="white" // Added background color
+    <Flex
+      bg={bgColor}
+      p={3}
+      align="center"
+      borderBottom="1px solid"
+      borderColor={borderColor}
+      backdropFilter="blur(10px)"
+      position="sticky"
+      top={0}
+      zIndex="1100" // Ensures Topbar is always on top
     >
-      <Flex align="center" justify="space-between" wrap="wrap">
-        {/* Title and Burger Menu for Small Screens */}
-        <Flex
-          align="center"
-          display={{ base: "flex", md: "none" }}
-          justify="space-between"
-          width="100%"
-        >
-          <Link href="/" passHref>
-            <Flex align="center" gap={2}>
-              <Box
-                fontWeight="bold"
-                fontSize="lg"
-                display="flex"
-                alignItems="center"
-                gap="4"
-              >
-                <BookOpenIcon className="mr-8" />
-                MyJournal
-              </Box>
-            </Flex>
-          </Link>
-          <Button
-            onClick={onOpen}
-            variant="outline"
-            size="sm"
-            bg="gray.200" // Updated button background for visibility
-            _hover={{ bg: "gray.300" }}
-            aria-label="Menu"
-          >
-            Menu
-          </Button>
-        </Flex>
-
-        {/* Full Menu for Larger Screens */}
-        <Flex
-          align="center"
-          gap={4}
-          display={{ base: "none", md: "flex" }}
-          justify="space-between"
-          width="100%"
-        >
-          <Link href="/" passHref>
-            <Flex align="center" gap={2}>
-              <Box
-                fontWeight="bold"
-                fontSize="2xl"
-                display="flex"
-                alignItems="center"
-                gap="4"
-              >
-                <BookOpenIcon className="mr-2" />
-                MyJournal
-              </Box>
-            </Flex>
-          </Link>
-
-          <Menu>
-            <MenuButton>
-              <Image
-                alt="dp"
-                src="/path-to-image.jpg" // Add a valid image source
-                border="1px solid black"
-                borderRadius="full"
-                boxSize="40px"
-                _hover={{ cursor: "pointer" }}
-              />
-            </MenuButton>
-            <MenuList>
-              <MenuItem>
-                <Button color="black" variant="ghost" w="100%">
-                  Sign Out
-                </Button>
-              </MenuItem>
-              <MenuItem>
-                <Button color="black" variant="ghost" w="100%">
-                  My Account
-                </Button>
-              </MenuItem>
-            </MenuList>
-          </Menu>
-        </Flex>
-      </Flex>
-
-      {/* Drawer for Small Screens */}
-      <Drawer placement="right" onClose={onClose} isOpen={isOpen}>
-        <DrawerOverlay
-          sx={{
-            backdropFilter: "blur(4px)",
-            background: "rgba(0, 0, 0, 0.2)",
-          }}
+      {/* Search Input */}
+      <Box flex="1" maxW="280px" mx={2} position="relative">
+        <Input
+          placeholder="Search..."
+          borderRadius="full"
+          bg={inputBg}
+          border="1px solid"
+          borderColor={borderColor}
+          px={4}
+          py={2}
+          maxH="34px"
+          _focus={{ bg: "white", borderColor: "blue.400", shadow: "md" }}
+          _placeholder={{ color: iconColor }}
         />
-        <DrawerContent
-          sx={{
-            backdropFilter: "blur(4px)",
-            background: "rgba(255, 255, 255, 0.6)",
-          }}
+        <IconButton
+          aria-label="Search"
+          icon={<FiSearch />}
+          size="sm"
+          position="absolute"
+          right={2}
+          top="50%"
+          transform="translateY(-50%)"
+          variant="ghost"
+          borderRadius="full"
+          color={iconColor}
+          _hover={{ bg: hoverBg, transition: "0.2s" }}
+        />
+      </Box>
+
+      <Spacer />
+
+      {/* Notifications Icon */}
+      <IconButton
+        aria-label="Notifications"
+        icon={<FiBell />}
+        variant="ghost"
+        color={iconColor}
+        fontSize="xl"
+        borderRadius="full"
+        _hover={{ bg: hoverBg, transform: "scale(1.1)", transition: "0.2s" }}
+      />
+
+      {/* Profile Dropdown Menu */}
+      <Menu>
+        <MenuButton>
+          <Avatar
+            name={session?.user?.name || "User"}
+            ml={4}
+            size="sm"
+            src={session?.user?.image || ""}
+            cursor="pointer"
+            _hover={{ transform: "scale(1.05)", transition: "0.2s" }}
+          />
+        </MenuButton>
+        <MenuList
+          bg={menuBg}
+          zIndex="1200" // Ensures MenuList is above everything
+          borderColor={borderColor}
+          shadow="xl"
+          borderRadius="12px"
         >
-          <DrawerCloseButton />
-          <DrawerBody>
-            <Flex direction="column" gap={2} mt={4}>
-              <Link href="/" passHref>
-                <Button
-                  variant="ghost"
-                  fontSize="lg"
-                  w="full"
-                  p="0.5rem"
-                  borderRadius="lg"
-                  justifyContent="flex-start"
-                  _hover={{ bg: "gray.100", textColor: "black" }}
-                >
-                  Home
-                </Button>
-              </Link>
-              <Link href="/account" passHref>
-                <Button
-                  variant="ghost"
-                  fontSize="lg"
-                  w="full"
-                  p="0.5rem"
-                  borderRadius="lg"
-                  justifyContent="flex-start"
-                  _hover={{ bg: "gray.100", textColor: "black" }}
-                >
-                  Account
-                </Button>
-              </Link>
-            </Flex>
-          </DrawerBody>
-        </DrawerContent>
-      </Drawer>
-    </Box>
+          <MenuItem
+            icon={<FiUser />}
+            onClick={() => router.push("/dashboard/profile")}
+            borderRadius="8px"
+            _hover={{ bg: hoverBg }}
+          >
+            Profile
+          </MenuItem>
+          <MenuItem
+            icon={<FiLogOut />}
+            onClick={() => signOut({ callbackUrl: "/" })}
+            borderRadius="8px"
+            _hover={{ bg: hoverBg }}
+          >
+            Logout
+          </MenuItem>
+        </MenuList>
+      </Menu>
+    </Flex>
   );
-}
+};
+
+export default Topbar;
