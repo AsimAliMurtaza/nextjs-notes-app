@@ -81,6 +81,76 @@ export default function Home() {
     );
   }
 
+  // Add this function to handle note deletion
+  const handleDeleteNote = async (noteId: string) => {
+    try {
+      const response = await fetch(`/api/delete-note`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ noteId }),
+      });
+
+      if (response.ok) {
+        // Remove the deleted note from the local state
+        setNotes((prevNotes) =>
+          prevNotes.filter((note) => note._id !== noteId)
+        );
+        toast({
+          title: "Note Deleted",
+          description: "The note has been deleted successfully.",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+        throw new Error("Failed to delete note");
+      }
+    } catch (error) {
+      console.error("Error deleting note:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete note. Please try again.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const handlePinNote = async (noteId: string, pinned: boolean) => {
+    try {
+      const response = await fetch(`/api/pin-notes`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ noteId, pinned }),
+      });
+
+      if (response.ok) {
+        // Update the local state to reflect the new pinned status
+        setNotes((prevNotes) =>
+          prevNotes.map((note) =>
+            note._id === noteId ? { ...note, pinned } : note
+          )
+        );
+      } else {
+        throw new Error("Failed to update pin status");
+      }
+    } catch (error) {
+      console.error("Error pinning/unpinning note:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update pin status. Please try again.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
   return (
     <Box
       bg={bgColor}
@@ -156,7 +226,7 @@ export default function Home() {
         <Text fontSize="xl" fontWeight="bold" color={textColor} mb={4}>
           Pinned Notes
         </Text>
-        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6} mb={8}>
+        <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6} mb={8}>
           {notes
             .filter((note) => note.pinned)
             .map((note) => (
@@ -187,6 +257,29 @@ export default function Home() {
                       {new Date(note.updatedAt).toLocaleDateString()}
                     </Text>
                   </HStack>
+                  <HStack mt={4}>
+                    <Button
+                      size="sm"
+                      colorScheme="blue"
+                      onClick={() => router.push(`/dashboard/edit/${note._id}`)}
+                    >
+                      View/Edit
+                    </Button>
+                    <Button
+                      size="sm"
+                      colorScheme={note.pinned ? "yellow" : "gray"}
+                      onClick={() => handlePinNote(note._id, !note.pinned)}
+                    >
+                      {note.pinned ? "Unpin" : "Pin"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      colorScheme="red"
+                      onClick={() => handleDeleteNote(note._id)}
+                    >
+                      Delete
+                    </Button>
+                  </HStack>
                 </CardBody>
               </Card>
             ))}
@@ -196,12 +289,12 @@ export default function Home() {
         <Text fontSize="xl" fontWeight="bold" color={textColor} mb={4}>
           All Notes
         </Text>
-        <VStack spacing={6} w="100%">
-          {notes.length > 0 ? (
-            notes.map((note) => (
+        <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6} mb={8}>
+          {notes
+            .filter((note) => !note.pinned)
+            .map((note) => (
               <Card
                 key={note._id}
-                w="100%"
                 bg={cardBg}
                 borderRadius="2xl"
                 boxShadow="lg"
@@ -227,13 +320,33 @@ export default function Home() {
                       {new Date(note.updatedAt).toLocaleDateString()}
                     </Text>
                   </HStack>
+                  <HStack mt={4}>
+                    <Button
+                      size="sm"
+                      colorScheme="blue"
+                      onClick={() => router.push(`/dashboard/edit/${note._id}`)}
+                    >
+                      View/Edit
+                    </Button>
+                    <Button
+                      size="sm"
+                      colorScheme={note.pinned ? "yellow" : "gray"}
+                      onClick={() => handlePinNote(note._id, !note.pinned)}
+                    >
+                      {note.pinned ? "Unpin" : "Pin"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      colorScheme="red"
+                      onClick={() => handleDeleteNote(note._id)}
+                    >
+                      Delete
+                    </Button>
+                  </HStack>
                 </CardBody>
               </Card>
-            ))
-          ) : (
-            <Text>No notes found. Start by creating a new entry!</Text>
-          )}
-        </VStack>
+            ))}
+        </SimpleGrid>
       </Box>
     </Box>
   );
