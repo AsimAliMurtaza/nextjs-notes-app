@@ -13,7 +13,6 @@ import {
   Flex,
   Divider,
   Grid,
-  GridItem,
   SimpleGrid,
   Spinner,
   useToast,
@@ -42,8 +41,8 @@ export default function Home() {
   const textColor = useColorModeValue("gray.800", "gray.100");
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.600");
-  const buttonBg = useColorModeValue("black", "blue.500");
-  const buttonHoverBg = useColorModeValue("gray.800", "blue.600");
+  const buttonBg = useColorModeValue("blue.500", "blue.600");
+  const buttonHoverBg = useColorModeValue("blue.600", "blue.700");
 
   // Fetch all notes from the backend
   useEffect(() => {
@@ -81,7 +80,13 @@ export default function Home() {
     );
   }
 
-  // Add this function to handle note deletion
+  const stripHtml = (text: string) => {
+    return text
+      .replace(/<[^>]+>/g, "") // Remove all HTML tags
+      .replace(/\s+/g, " ") // Replace multiple spaces with a single space
+      .trim(); // Trim leading and trailing spaces
+  };
+  // Function to handle note deletion
   const handleDeleteNote = async (noteId: string) => {
     try {
       const response = await fetch(`/api/delete-note`, {
@@ -93,7 +98,6 @@ export default function Home() {
       });
 
       if (response.ok) {
-        // Remove the deleted note from the local state
         setNotes((prevNotes) =>
           prevNotes.filter((note) => note._id !== noteId)
         );
@@ -119,6 +123,7 @@ export default function Home() {
     }
   };
 
+  // Function to handle pinning/unpinning notes
   const handlePinNote = async (noteId: string, pinned: boolean) => {
     try {
       const response = await fetch(`/api/pin-notes`, {
@@ -130,7 +135,6 @@ export default function Home() {
       });
 
       if (response.ok) {
-        // Update the local state to reflect the new pinned status
         setNotes((prevNotes) =>
           prevNotes.map((note) =>
             note._id === noteId ? { ...note, pinned } : note
@@ -152,16 +156,8 @@ export default function Home() {
   };
 
   return (
-    <Box
-      bg={bgColor}
-      p={8}
-      sx={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "flex-start",
-      }}
-    >
-      <Box flex="1" maxW="1200px">
+    <Box bg={bgColor} p={8}>
+      <Box maxW="1200px" mx="auto">
         {/* Header Section */}
         <Flex justify="space-between" align="center" mb={8}>
           <Text fontSize="2xl" fontWeight="bold" color={textColor}>
@@ -170,10 +166,7 @@ export default function Home() {
           <Button
             color="white"
             bg={buttonBg}
-            _hover={{
-              bg: buttonHoverBg,
-              shadow: "md",
-            }}
+            _hover={{ bg: buttonHoverBg, shadow: "md" }}
             onClick={() => router.push("/dashboard/create")}
             borderRadius="full"
             leftIcon={<Icon as={PlusIcon} />}
@@ -244,8 +237,8 @@ export default function Home() {
                   {note.title}
                 </CardHeader>
                 <CardBody>
-                  <Text color={textColor}>
-                    {note.content.substring(0, 100)}...
+                  <Text color={textColor} noOfLines={4}>
+                    {stripHtml(note.content)}
                   </Text>
                   <Divider my={4} borderColor={borderColor} />
                   <HStack spacing={4}>
@@ -260,13 +253,17 @@ export default function Home() {
                   <HStack mt={4}>
                     <Button
                       size="sm"
-                      colorScheme="blue"
+                      variant="ghost"
+                      borderRadius="full"
+                      colorScheme="green"
                       onClick={() => router.push(`/dashboard/edit/${note._id}`)}
                     >
                       View/Edit
                     </Button>
                     <Button
                       size="sm"
+                      variant="ghost"
+                      borderRadius="full"
                       colorScheme={note.pinned ? "yellow" : "gray"}
                       onClick={() => handlePinNote(note._id, !note.pinned)}
                     >
@@ -274,6 +271,8 @@ export default function Home() {
                     </Button>
                     <Button
                       size="sm"
+                      variant="ghost"
+                      borderRadius="full"
                       colorScheme="red"
                       onClick={() => handleDeleteNote(note._id)}
                     >
@@ -307,8 +306,8 @@ export default function Home() {
                   {note.title}
                 </CardHeader>
                 <CardBody>
-                  <Text color={textColor}>
-                    {note.content.substring(0, 100)}...
+                  <Text color={textColor} noOfLines={4}>
+                    {stripHtml(note.content)}
                   </Text>
                   <Divider my={4} borderColor={borderColor} />
                   <HStack spacing={4}>
@@ -323,13 +322,17 @@ export default function Home() {
                   <HStack mt={4}>
                     <Button
                       size="sm"
-                      colorScheme="blue"
+                      variant="ghost"
+                      borderRadius="full"
+                      colorScheme="green"
                       onClick={() => router.push(`/dashboard/edit/${note._id}`)}
                     >
                       View/Edit
                     </Button>
                     <Button
                       size="sm"
+                      variant="ghost"
+                      borderRadius="full"
                       colorScheme={note.pinned ? "yellow" : "gray"}
                       onClick={() => handlePinNote(note._id, !note.pinned)}
                     >
@@ -338,6 +341,8 @@ export default function Home() {
                     <Button
                       size="sm"
                       colorScheme="red"
+                      variant="ghost"
+                      borderRadius="full"
                       onClick={() => handleDeleteNote(note._id)}
                     >
                       Delete

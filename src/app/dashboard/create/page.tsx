@@ -15,10 +15,9 @@ import {
   useColorModeValue,
   Icon,
   VStack,
-  HStack,
   useToast,
 } from "@chakra-ui/react";
-import { PlusIcon, SaveIcon } from "lucide-react";
+import { SaveIcon } from "lucide-react";
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
@@ -33,8 +32,8 @@ export default function NewEntry() {
   const textColor = useColorModeValue("gray.800", "gray.100");
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.600");
-  const buttonBg = useColorModeValue("black", "blue.500");
-  const buttonHoverBg = useColorModeValue("gray.800", "blue.600");
+  const buttonBg = useColorModeValue("blue.500", "blue.600");
+  const buttonHoverBg = useColorModeValue("blue.600", "blue.700");
 
   const handleEditorChange = (value: string) => {
     setEditorContent(value);
@@ -123,16 +122,19 @@ export default function NewEntry() {
                 borderRadius="lg"
                 borderColor={borderColor}
                 _focus={{ borderColor: "blue.500", boxShadow: "sm" }}
+                fontSize="md"
+                fontWeight="medium"
               />
 
               {/* React Quill Editor */}
               <Box
                 w="full"
-                h="300px"
+                h="400px"
                 overflow="auto"
                 border="1px solid"
                 borderColor={borderColor}
                 borderRadius="lg"
+                bg={useColorModeValue("white", "gray.700")}
               >
                 <ReactQuill
                   value={editorContent}
@@ -142,6 +144,7 @@ export default function NewEntry() {
                   style={{
                     height: "100%",
                     borderRadius: "8px",
+                    border: "none",
                   }}
                   modules={{
                     toolbar: [
@@ -166,6 +169,8 @@ export default function NewEntry() {
                 borderRadius="full"
                 leftIcon={<Icon as={SaveIcon} />}
                 onClick={handleSaveEntry}
+                size="lg"
+                fontWeight="semibold"
               >
                 Save Entry
               </Button>
