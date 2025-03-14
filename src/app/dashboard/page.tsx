@@ -16,10 +16,12 @@ import {
   SimpleGrid,
   Spinner,
   useToast,
+  IconButton,
 } from "@chakra-ui/react";
 import { PlusIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { BiPlus } from "react-icons/bi";
 
 export default function Home() {
   const router = useRouter();
@@ -41,8 +43,8 @@ export default function Home() {
   const textColor = useColorModeValue("gray.800", "gray.100");
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.600");
-  const buttonBg = useColorModeValue("blue.500", "blue.600");
-  const buttonHoverBg = useColorModeValue("blue.600", "blue.700");
+  const buttonBg = useColorModeValue("green.500", "green.600");
+  const buttonHoverBg = useColorModeValue("green.600", "green.700");
 
   // Fetch all notes from the backend
   useEffect(() => {
@@ -163,16 +165,22 @@ export default function Home() {
           <Text fontSize="2xl" fontWeight="bold" color={textColor}>
             Recent Entries
           </Text>
-          <Button
+          <IconButton
             color="white"
             bg={buttonBg}
             _hover={{ bg: buttonHoverBg, shadow: "md" }}
             onClick={() => router.push("/dashboard/create")}
             borderRadius="full"
-            leftIcon={<Icon as={PlusIcon} />}
-          >
-            New Entry
-          </Button>
+            icon={<BiPlus />}
+            shadow={"lg"}
+            sx={{
+                "&:hover": {
+                    transform: "scale(1.05)",
+                    boxShadow: "xl",
+                },
+            }}
+            aria-label={"add-note"}
+          />
         </Flex>
 
         {/* Stats Section */}

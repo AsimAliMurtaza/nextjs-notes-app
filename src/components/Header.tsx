@@ -28,7 +28,7 @@ const Topbar = () => {
   const borderColor = useColorModeValue("gray.300", "gray.700");
   const inputBg = useColorModeValue("whiteAlpha.800", "gray.700");
   const iconColor = useColorModeValue("gray.600", "gray.300");
-  const hoverBg = useColorModeValue("blue.100", "blue.700");
+  const hoverBg = useColorModeValue("green.100", "green.700");
   const menuBg = useColorModeValue("white", "gray.700");
 
   return (

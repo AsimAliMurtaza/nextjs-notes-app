@@ -26,7 +26,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
 
-  const hoverColor = useColorModeValue("blue.400", "blue.600");
+  const hoverColor = useColorModeValue("green.400", "green.600");
   const textColor = useColorModeValue("gray.800", "white");
   const sidebarBg = useColorModeValue("gray.50", "gray.900");
 
@@ -121,7 +121,7 @@ const NavItem = ({
         w="full"
         borderRadius="50"
         cursor="pointer"
-        bg={isActive ? "blue.500" : "transparent"}
+        bg={isActive ? "green.500" : "transparent"}
         color={isActive ? "white" : "inherit"}
         _hover={{
           bg: hoverColor,

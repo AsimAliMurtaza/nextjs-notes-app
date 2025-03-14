@@ -32,8 +32,8 @@ export default function LoginPage() {
   const router = useRouter();
 
   // Color mode values
-  const bgColor = useColorModeValue("gray.50", "gray.800");
-  const cardBgColor = useColorModeValue("white", "gray.700");
+  const bgColor = useColorModeValue("gray.50", "gray.900");
+  const cardBgColor = useColorModeValue("white", "gray.800");
   const textColor = useColorModeValue("gray.600", "gray.200");
   const borderColor = useColorModeValue("gray.300", "gray.600");
 
@@ -140,20 +140,6 @@ export default function LoginPage() {
             </Button>
 
             <Divider borderColor={borderColor} />
-
-            <Text fontSize="sm" color={textColor}>
-              Or continue with
-            </Text>
-            <VStack spacing={3} w="full">
-              <Button
-                variant="outline"
-                w="full"
-                leftIcon={<FcGoogle />}
-                onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-              >
-                Google
-              </Button>
-            </VStack>
 
             {/* 🔗 Extra Links */}
             <Text fontSize="sm" color="blue.500" textAlign="center" mt={4}>

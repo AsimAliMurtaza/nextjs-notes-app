@@ -104,21 +104,19 @@ export default function EditNote({ params }: { params: { id: string } }) {
   }
 
   return (
-    <Flex
-      direction="column"
-      align="center"
-      justify="flex-start"
-      minH="100vh"
-      p={8}
-    >
-      <Card w="full" maxW="900px" borderRadius="2xl" boxShadow="lg">
+    <Flex direction="column" align="center" justify="flex-start" minH="100vh">
+      <Card
+        w="full"
+        bg={useColorModeValue("gray.50", "gray.900")}
+        boxShadow="lg"
+      >
         <CardHeader>
-          <Text fontSize="2xl" fontWeight="bold">
+          <Text fontSize="xl" fontWeight="bold">
             Edit Note
           </Text>
         </CardHeader>
         <CardBody>
-          <FormControl mb={6}>
+          <FormControl mb={4}>
             <VStack spacing={6} align="start">
               <Input
                 type="text"
@@ -143,9 +141,11 @@ export default function EditNote({ params }: { params: { id: string } }) {
                 />
               </Box>
               <Button
-                colorScheme="blue"
+                colorScheme="green"
                 leftIcon={<Icon as={SaveIcon} />}
                 onClick={handleSave}
+                borderRadius="full"
+                variant="ghost"
               >
                 Save Changes
               </Button>

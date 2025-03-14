@@ -32,8 +32,8 @@ export default function NewEntry() {
   const textColor = useColorModeValue("gray.800", "gray.100");
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.600");
-  const buttonBg = useColorModeValue("blue.500", "blue.600");
-  const buttonHoverBg = useColorModeValue("blue.600", "blue.700");
+  const buttonBg = useColorModeValue("green.500", "green.600");
+  const buttonHoverBg = useColorModeValue("green.600", "green.700");
 
   const handleEditorChange = (value: string) => {
     setEditorContent(value);
@@ -94,20 +94,16 @@ export default function NewEntry() {
       justify="flex-start"
       minH="100vh"
       bg={bgColor}
-      p={8}
     >
       <Card
         w="full"
-        maxW={{ base: "400px", md: "600px", lg: "900px" }}
         bg={cardBg}
-        border="1px solid"
         borderColor={borderColor}
-        borderRadius="2xl"
         boxShadow="lg"
       >
         <CardHeader>
-          <Text fontSize="2xl" fontWeight="bold" color={textColor}>
-            What's on your mind? 🤔
+          <Text fontSize="xl" fontWeight="bold" color={textColor}>
+            New Journal Entry
           </Text>
         </CardHeader>
         <CardBody>
@@ -160,12 +156,8 @@ export default function NewEntry() {
 
               {/* Save Button */}
               <Button
-                color="white"
-                bg={buttonBg}
-                _hover={{
-                  bg: buttonHoverBg,
-                  shadow: "md",
-                }}
+              colorScheme="green"
+                variant="ghost"
                 borderRadius="full"
                 leftIcon={<Icon as={SaveIcon} />}
                 onClick={handleSaveEntry}
