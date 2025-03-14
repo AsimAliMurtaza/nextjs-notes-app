@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
@@ -40,7 +40,7 @@ export default function NewEntry() {
     setEditorContent(value);
   };
 
-  const handleSaveEntry = () => {
+  const handleSaveEntry = async () => {
     if (!title.trim() || !editorContent.trim()) {
       toast({
         title: "Error",
@@ -52,21 +52,40 @@ export default function NewEntry() {
       return;
     }
 
-    // Simulate saving the entry (replace with actual API call)
-    console.log("Title:", title);
-    console.log("Content:", editorContent);
+    try {
+      const response = await fetch("/api/save-notes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title, content: editorContent }),
+      });
 
-    toast({
-      title: "Entry Saved",
-      description: "Your journal entry has been saved successfully.",
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-    });
+      if (response.ok) {
+        toast({
+          title: "Entry Saved",
+          description: "Your journal entry has been saved successfully.",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
 
-    // Clear the form after saving
-    setTitle("");
-    setEditorContent("");
+        // Clear the form after saving
+        setTitle("");
+        setEditorContent("");
+      } else {
+        throw new Error("Failed to save note");
+      }
+    } catch (error) {
+      console.error("Error saving note:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save note. Please try again.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
   };
 
   return (

@@ -15,12 +15,27 @@ import {
   Grid,
   GridItem,
   SimpleGrid,
+  Spinner,
+  useToast,
 } from "@chakra-ui/react";
 import { PlusIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const router = useRouter();
+  interface Note {
+    _id: string;
+    title: string;
+    content: string;
+    pinned: boolean;
+    createdAt: string;
+    updatedAt: string;
+  }
+
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [loading, setLoading] = useState(true);
+  const toast = useToast();
 
   // Color mode values
   const bgColor = useColorModeValue("gray.50", "gray.900");
@@ -29,6 +44,42 @@ export default function Home() {
   const borderColor = useColorModeValue("gray.200", "gray.600");
   const buttonBg = useColorModeValue("black", "blue.500");
   const buttonHoverBg = useColorModeValue("gray.800", "blue.600");
+
+  // Fetch all notes from the backend
+  useEffect(() => {
+    const fetchNotes = async () => {
+      try {
+        const response = await fetch("/api/get-notes");
+        if (response.ok) {
+          const data = await response.json();
+          setNotes(data.notes);
+        } else {
+          throw new Error("Failed to fetch notes");
+        }
+      } catch (error) {
+        console.error("Error fetching notes:", error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch notes. Please try again.",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNotes();
+  }, []);
+
+  if (loading) {
+    return (
+      <Flex justify="center" align="center" minH="100vh">
+        <Spinner size="xl" />
+      </Flex>
+    );
+  }
 
   return (
     <Box
@@ -79,7 +130,7 @@ export default function Home() {
             </CardHeader>
             <CardBody>
               <Text fontSize="3xl" fontWeight="bold" color={textColor}>
-                42
+                {notes.length}
               </Text>
             </CardBody>
           </Card>
@@ -95,7 +146,7 @@ export default function Home() {
             </CardHeader>
             <CardBody>
               <Text fontSize="3xl" fontWeight="bold" color={textColor}>
-                5
+                {notes.filter((note) => note.pinned).length}
               </Text>
             </CardBody>
           </Card>
@@ -106,61 +157,39 @@ export default function Home() {
           Pinned Notes
         </Text>
         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6} mb={8}>
-          <Card
-            bg={cardBg}
-            borderRadius="2xl"
-            boxShadow="lg"
-            border="1px solid"
-            borderColor={borderColor}
-            transition="all 0.2s"
-            _hover={{ transform: "scale(1.02)", shadow: "xl" }}
-          >
-            <CardHeader fontWeight="bold" fontSize="lg" color={textColor}>
-              Pinned Entry 1
-            </CardHeader>
-            <CardBody>
-              <Text color={textColor}>
-                This is a pinned entry. It could contain important notes or
-                reminders.
-              </Text>
-              <Divider my={4} borderColor={borderColor} />
-              <HStack spacing={4}>
-                <Text fontSize="sm" color="gray.500">
-                  Created: 2023-10-01
-                </Text>
-                <Text fontSize="sm" color="gray.500">
-                  Last Updated: 2023-10-02
-                </Text>
-              </HStack>
-            </CardBody>
-          </Card>
-          <Card
-            bg={cardBg}
-            borderRadius="2xl"
-            boxShadow="lg"
-            border="1px solid"
-            borderColor={borderColor}
-            transition="all 0.2s"
-            _hover={{ transform: "scale(1.02)", shadow: "xl" }}
-          >
-            <CardHeader fontWeight="bold" fontSize="lg" color={textColor}>
-              Pinned Entry 2
-            </CardHeader>
-            <CardBody>
-              <Text color={textColor}>
-                Another pinned entry with some more details.
-              </Text>
-              <Divider my={4} borderColor={borderColor} />
-              <HStack spacing={4}>
-                <Text fontSize="sm" color="gray.500">
-                  Created: 2023-10-03
-                </Text>
-                <Text fontSize="sm" color="gray.500">
-                  Last Updated: 2023-10-04
-                </Text>
-              </HStack>
-            </CardBody>
-          </Card>
+          {notes
+            .filter((note) => note.pinned)
+            .map((note) => (
+              <Card
+                key={note._id}
+                bg={cardBg}
+                borderRadius="2xl"
+                boxShadow="lg"
+                border="1px solid"
+                borderColor={borderColor}
+                transition="all 0.2s"
+                _hover={{ transform: "scale(1.02)", shadow: "xl" }}
+              >
+                <CardHeader fontWeight="bold" fontSize="lg" color={textColor}>
+                  {note.title}
+                </CardHeader>
+                <CardBody>
+                  <Text color={textColor}>
+                    {note.content.substring(0, 100)}...
+                  </Text>
+                  <Divider my={4} borderColor={borderColor} />
+                  <HStack spacing={4}>
+                    <Text fontSize="sm" color="gray.500">
+                      Created: {new Date(note.createdAt).toLocaleDateString()}
+                    </Text>
+                    <Text fontSize="sm" color="gray.500">
+                      Last Updated:{" "}
+                      {new Date(note.updatedAt).toLocaleDateString()}
+                    </Text>
+                  </HStack>
+                </CardBody>
+              </Card>
+            ))}
         </SimpleGrid>
 
         {/* All Notes Section */}
@@ -168,66 +197,42 @@ export default function Home() {
           All Notes
         </Text>
         <VStack spacing={6} w="100%">
-          <Card
-            w="100%"
-            bg={cardBg}
-            borderRadius="2xl"
-            boxShadow="lg"
-            border="1px solid"
-            borderColor={borderColor}
-            transition="all 0.2s"
-            _hover={{ transform: "scale(1.02)", shadow: "xl" }}
-          >
-            <CardHeader fontWeight="bold" fontSize="lg" color={textColor}>
-              Entry 1
-            </CardHeader>
-            <CardBody>
-              <Text color={textColor}>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi
-                cum officiis reprehenderit quae numquam. Vero vitae quia
-                nesciunt sit suscipit temporibus similique dolores? Asperiores,
-                error. Praesentium ex minus id consequuntur.
-              </Text>
-              <Divider my={4} borderColor={borderColor} />
-              <HStack spacing={4}>
-                <Text fontSize="sm" color="gray.500">
-                  Created: 2023-10-01
-                </Text>
-                <Text fontSize="sm" color="gray.500">
-                  Last Updated: 2023-10-02
-                </Text>
-              </HStack>
-            </CardBody>
-          </Card>
-          <Card
-            w="100%"
-            bg={cardBg}
-            borderRadius="2xl"
-            boxShadow="lg"
-            border="1px solid"
-            borderColor={borderColor}
-            transition="all 0.2s"
-            _hover={{ transform: "scale(1.02)", shadow: "xl" }}
-          >
-            <CardHeader fontWeight="bold" fontSize="lg" color={textColor}>
-              Entry 2
-            </CardHeader>
-            <CardBody>
-              <Text color={textColor}>
-                Another journal entry with some more details. This could include
-                thoughts, reflections, or anything else you want to document.
-              </Text>
-              <Divider my={4} borderColor={borderColor} />
-              <HStack spacing={4}>
-                <Text fontSize="sm" color="gray.500">
-                  Created: 2023-10-03
-                </Text>
-                <Text fontSize="sm" color="gray.500">
-                  Last Updated: 2023-10-04
-                </Text>
-              </HStack>
-            </CardBody>
-          </Card>
+          {notes.length > 0 ? (
+            notes.map((note) => (
+              <Card
+                key={note._id}
+                w="100%"
+                bg={cardBg}
+                borderRadius="2xl"
+                boxShadow="lg"
+                border="1px solid"
+                borderColor={borderColor}
+                transition="all 0.2s"
+                _hover={{ transform: "scale(1.02)", shadow: "xl" }}
+              >
+                <CardHeader fontWeight="bold" fontSize="lg" color={textColor}>
+                  {note.title}
+                </CardHeader>
+                <CardBody>
+                  <Text color={textColor}>
+                    {note.content.substring(0, 100)}...
+                  </Text>
+                  <Divider my={4} borderColor={borderColor} />
+                  <HStack spacing={4}>
+                    <Text fontSize="sm" color="gray.500">
+                      Created: {new Date(note.createdAt).toLocaleDateString()}
+                    </Text>
+                    <Text fontSize="sm" color="gray.500">
+                      Last Updated:{" "}
+                      {new Date(note.updatedAt).toLocaleDateString()}
+                    </Text>
+                  </HStack>
+                </CardBody>
+              </Card>
+            ))
+          ) : (
+            <Text>No notes found. Start by creating a new entry!</Text>
+          )}
         </VStack>
       </Box>
     </Box>
