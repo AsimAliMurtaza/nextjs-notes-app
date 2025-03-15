@@ -1,5 +1,4 @@
 import { Providers } from "./providers";
-import Header from "@/components/Header";
 
 export default function RootLayout({
   children,
