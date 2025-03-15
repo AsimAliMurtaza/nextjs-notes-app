@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import {
   Box,
   VStack,
@@ -16,6 +16,7 @@ import {
   MenuList,
   MenuItem,
   Divider,
+  Spinner,
 } from "@chakra-ui/react";
 import { BiHome, BiMenuAltLeft, BiMenu, BiArchive } from "react-icons/bi";
 import { FiSettings, FiLogOut } from "react-icons/fi";
@@ -23,13 +24,13 @@ import { FaUser } from "react-icons/fa";
 import { signOut, useSession } from "next-auth/react";
 
 const modules = [
-  { name: "My Journals", icon: BiHome, path: "/dashboard" },
+  { name: "My Notes", icon: BiHome, path: "/dashboard" },
   { name: "Archived", icon: BiArchive, path: "/dashboard/archive" },
   { name: "Settings", icon: FiSettings, path: "/dashboard/settings" },
 ];
 
 const DashboardLayout = ({ children }: { children: ReactNode }) => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
@@ -38,7 +39,21 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
   const textColor = useColorModeValue("gray.800", "white");
   const sidebarBg = useColorModeValue("gray.50", "gray.900");
 
-  const sidebarWidth = collapsed ? "80px" : "250px";
+  const sidebarWidth = collapsed ? "88px" : "250px";
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login"); // Redirect to login if not authenticated
+    }
+  }, [status, router]);
+
+  if (status === "loading") {
+    return (
+      <Flex justify="center" align="center" height="100vh">
+        <Spinner size="xl" />
+      </Flex>
+    );
+  }
 
   return (
     <Flex h="100vh" overflow="hidden">
@@ -100,7 +115,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
             <Divider mb={4} />
             <Menu>
               <MenuButton w="full">
-                <Flex align="center" p={2}>
+                <Flex zIndex={1200} align="center" p={2}>
                   <Avatar size="sm" src={session.user?.image || ""} />
                   {!collapsed && (
                     <Text ml={3} fontSize="md" fontWeight="medium">
@@ -109,7 +124,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
                   )}
                 </Flex>
               </MenuButton>
-              <MenuList>
+              <MenuList zIndex={1200}>
                 <MenuItem
                   icon={<FaUser />}
                   onClick={() => router.push("/dashboard/profile")}
@@ -160,10 +175,8 @@ const NavItem = ({
       <Flex
         align="center"
         w="full"
-        borderRadius="24"
+        borderRadius="50"
         cursor="pointer"
-        h={10}
-        px={2}
         bg={isActive ? "green.500" : "transparent"}
         color={isActive ? "white" : "inherit"}
         _hover={{

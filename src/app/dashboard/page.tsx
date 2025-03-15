@@ -18,10 +18,20 @@ import {
   useToast,
   IconButton,
 } from "@chakra-ui/react";
-import { PlusIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BiPlus } from "react-icons/bi";
+import { useSession } from "next-auth/react";
+import { Session } from "next-auth";
+
+interface ExtendedSession extends Session {
+  user: {
+    id: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+  };
+}
 
 export default function Home() {
   const router = useRouter();
@@ -37,7 +47,6 @@ export default function Home() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const toast = useToast();
-
   // Color mode values
   const bgColor = useColorModeValue("gray.50", "gray.900");
   const textColor = useColorModeValue("gray.800", "gray.100");
@@ -46,11 +55,16 @@ export default function Home() {
   const buttonBg = useColorModeValue("green.500", "green.600");
   const buttonHoverBg = useColorModeValue("green.600", "green.700");
 
+  const { data: session } = useSession() as {
+    data: ExtendedSession | null;
+  };
+
+  const userID = session?.user?.id;
   // Fetch all notes from the backend
   useEffect(() => {
     const fetchNotes = async () => {
       try {
-        const response = await fetch("/api/get-notes");
+        const response = await fetch(`/api/get-notes?userID=${userID}`);
         if (response.ok) {
           const data = await response.json();
           setNotes(data.notes);
@@ -71,12 +85,14 @@ export default function Home() {
       }
     };
 
-    fetchNotes();
-  }, []);
+    if (userID) {
+      fetchNotes();
+    }
+  }, [userID, toast]);
 
   if (loading) {
     return (
-      <Flex justify="center" align="center" minH="100vh">
+      <Flex justify="center" align="center" height="100vh">
         <Spinner size="xl" />
       </Flex>
     );
@@ -174,10 +190,10 @@ export default function Home() {
             icon={<BiPlus />}
             shadow={"lg"}
             sx={{
-                "&:hover": {
-                    transform: "scale(1.05)",
-                    boxShadow: "xl",
-                },
+              "&:hover": {
+                transform: "scale(1.05)",
+                boxShadow: "xl",
+              },
             }}
             aria-label={"add-note"}
           />

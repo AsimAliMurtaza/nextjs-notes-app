@@ -18,22 +18,41 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { SaveIcon } from "lucide-react";
+import { useSession } from "next-auth/react";
 
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+interface SessionWithId extends Session {
+  user: {
+    id: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+  };
+}
+
+// Dynamically import ReactQuill with SSR disabled
+const ReactQuill = dynamic(() => import("react-quill"), {
+  ssr: false,
+  loading: () => <p>Loading editor...</p>,
+});
 import "react-quill/dist/quill.snow.css";
+import { Session } from "next-auth";
 
 export default function NewEntry() {
-  const [editorContent, setEditorContent] = useState("");
-  const [title, setTitle] = useState("");
+  const [editorContent, setEditorContent] = useState<string>("");
+  const [title, setTitle] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const toast = useToast();
+
+  const { data: session, status } = useSession() as {
+    data: SessionWithId | null;
+    status: string;
+  };
 
   // Color mode values
   const bgColor = useColorModeValue("gray.50", "gray.900");
   const textColor = useColorModeValue("gray.800", "gray.100");
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.600");
-  const buttonBg = useColorModeValue("green.500", "green.600");
-  const buttonHoverBg = useColorModeValue("green.600", "green.700");
 
   const handleEditorChange = (value: string) => {
     setEditorContent(value);
@@ -51,13 +70,30 @@ export default function NewEntry() {
       return;
     }
 
+    if (status !== "authenticated" || !session?.user?.id) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to save a note.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
     try {
       const response = await fetch("/api/save-notes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ title, content: editorContent }),
+        body: JSON.stringify({
+          userID: session.user.id,
+          title,
+          content: editorContent,
+        }),
       });
 
       if (response.ok) {
@@ -84,6 +120,8 @@ export default function NewEntry() {
         duration: 3000,
         isClosable: true,
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -94,16 +132,18 @@ export default function NewEntry() {
       justify="flex-start"
       minH="100vh"
       bg={bgColor}
+      p={4}
     >
       <Card
         w="full"
+        maxW="800px"
         bg={cardBg}
         borderColor={borderColor}
         boxShadow="lg"
       >
         <CardHeader>
           <Text fontSize="xl" fontWeight="bold" color={textColor}>
-            New Journal Entry
+            New Note
           </Text>
         </CardHeader>
         <CardBody>
@@ -156,15 +196,18 @@ export default function NewEntry() {
 
               {/* Save Button */}
               <Button
-              colorScheme="green"
+                colorScheme="green"
                 variant="ghost"
                 borderRadius="full"
                 leftIcon={<Icon as={SaveIcon} />}
                 onClick={handleSaveEntry}
                 size="lg"
                 fontWeight="semibold"
+                isLoading={isLoading}
+                loadingText="Saving..."
+                aria-label="Save note"
               >
-                Save Entry
+                Save
               </Button>
             </VStack>
           </FormControl>

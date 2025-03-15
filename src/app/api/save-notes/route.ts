@@ -2,12 +2,17 @@
 import { NextResponse } from "next/server";
 import Note from "@/models/Note";
 import connectDB from "@/lib/mongodb";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/options";
 
 export async function POST(req: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     await connectDB(); // Connect to MongoDB
 
-    const { title, content } = await req.json();
+    const { userID, title, content } = await req.json();
 
     if (!title || !content) {
       return NextResponse.json(
@@ -15,8 +20,7 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-
-    const newNote = new Note({ title, content });
+    const newNote = new Note({ userID, title, content });
     await newNote.save();
 
     return NextResponse.json(
@@ -25,6 +29,9 @@ export async function POST(req: Request) {
     );
   } catch (error) {
     console.error("Error saving note:", error);
-    return NextResponse.json({ message: "Failed to save note" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Failed to save note" },
+      { status: 500 }
+    );
   }
 }

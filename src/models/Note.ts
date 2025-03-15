@@ -2,6 +2,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface INote extends Document {
+  userID: string;
   title: string;
   content: string;
   pinned: boolean; // Add this field
@@ -11,6 +12,7 @@ export interface INote extends Document {
 
 const NoteSchema: Schema = new Schema(
   {
+    userID: { type: String, required: true },
     title: { type: String, required: true },
     content: { type: String, required: true },
     pinned: { type: Boolean, default: false }, // Add this field with a default value of `false`
@@ -18,4 +20,5 @@ const NoteSchema: Schema = new Schema(
   { timestamps: true } // Automatically adds `createdAt` and `updatedAt` fields
 );
 
-export default mongoose.models.Note || mongoose.model<INote>("Note", NoteSchema);
+export default mongoose.models.Note ||
+  mongoose.model<INote>("Note", NoteSchema);
