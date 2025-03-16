@@ -177,15 +177,14 @@ export default function Home() {
     <Box bg={bgColor} p={8} minH="100vh">
       <Box maxW="1200px" mx="auto">
         <Flex justify="space-between" align="center" mb={8}>
-
           <IconButton
             color="white"
             bg={buttonBg}
-            _hover={{ bg: buttonHoverBg, shadow: "md" }}
+            _hover={{ bg: buttonHoverBg, shadow: "lg" }}
             onClick={() => router.push("/dashboard/create")}
             borderRadius="full"
             icon={<BiPlus />}
-            shadow={"lg"}
+            shadow={"xl"}
             aria-label={"add-note"}
           />
         </Flex>

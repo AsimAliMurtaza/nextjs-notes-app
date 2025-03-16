@@ -18,6 +18,7 @@ import {
   useToast,
   Spinner,
   Divider,
+  IconButton,
 } from "@chakra-ui/react";
 import { SaveIcon, ArrowLeftIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -32,7 +33,7 @@ export default function EditNote({ params }: { params: { id: string } }) {
   const [loading, setLoading] = useState(true);
   const toast = useToast();
 
-  const bgColor = useColorModeValue("gray.100", "gray.900");
+  const bgColor = useColorModeValue("white", "gray.900");
   const textColor = useColorModeValue("gray.800", "gray.100");
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.600");
@@ -110,9 +111,26 @@ export default function EditNote({ params }: { params: { id: string } }) {
   }
 
   return (
-    <Flex direction="column" align="center" justify="flex-start" minH="100vh" bg={bgColor} p={4}>
-      <Card w="full" maxW="800px" bg={cardBg} boxShadow="md" borderRadius="lg" borderColor={borderColor}>
-        <CardHeader display="flex" justifyContent="space-between" alignItems="center">
+    <Flex
+      direction="column"
+      align="center"
+      justify="flex-start"
+      minH="100vh"
+      bg={bgColor}
+      p={4}
+    >
+      <Card
+        w="full"
+        bg={cardBg}
+        boxShadow="md"
+        borderRadius="lg"
+        borderColor={borderColor}
+      >
+        <CardHeader
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+        >
           <Text fontSize="xl" fontWeight="semibold" color={textColor}>
             Edit Note
           </Text>
@@ -142,7 +160,7 @@ export default function EditNote({ params }: { params: { id: string } }) {
               />
               <Box
                 w="full"
-                h="300px"
+                h="260px"
                 overflow="auto"
                 border="1px solid"
                 borderColor={borderColor}
@@ -154,7 +172,11 @@ export default function EditNote({ params }: { params: { id: string } }) {
                   onChange={setContent}
                   theme="snow"
                   placeholder="Start typing your content..."
-                  style={{ height: "100%", borderRadius: "8px", border: "none" }}
+                  style={{
+                    height: "80%",
+                    borderRadius: "8px",
+                    border: "none",
+                  }}
                   modules={{
                     toolbar: [
                       [{ header: [1, 2, 3, false] }],
@@ -166,18 +188,17 @@ export default function EditNote({ params }: { params: { id: string } }) {
                   }}
                 />
               </Box>
-              <Button
+              <IconButton
                 colorScheme="green"
                 bg={buttonBg}
+                aria-label="Save Note"
                 _hover={{ bg: buttonHoverBg }}
-                leftIcon={<Icon as={SaveIcon} />}
+                icon={<SaveIcon size={16} />}
                 onClick={handleSave}
                 borderRadius="full"
                 fontWeight="semibold"
                 size="lg"
-              >
-                Save Changes
-              </Button>
+              />
             </VStack>
           </FormControl>
         </CardBody>

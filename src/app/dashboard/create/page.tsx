@@ -24,6 +24,8 @@ import { SaveIcon, XIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import "react-quill/dist/quill.snow.css";
 import { Session } from "next-auth";
+import { useRouter } from "next/navigation";
+import { FaArrowLeft } from "react-icons/fa";
 
 interface SessionWithId extends Session {
   user: {
@@ -43,13 +45,14 @@ export default function NewEntry() {
   const [editorContent, setEditorContent] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const router = useRouter();
   const toast = useToast();
   const { data: session, status } = useSession() as {
     data: SessionWithId | null;
     status: string;
   };
 
-  const bgColor = useColorModeValue("gray.100", "gray.900");
+  const bgColor = useColorModeValue("white", "gray.900");
   const textColor = useColorModeValue("gray.800", "gray.100");
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.600");
@@ -63,6 +66,7 @@ export default function NewEntry() {
   const clearForm = () => {
     setTitle("");
     setEditorContent("");
+    router.push("/dashboard");
   };
 
   const handleSaveEntry = async () => {
@@ -140,20 +144,24 @@ export default function NewEntry() {
     >
       <Card
         w="full"
-        maxW="800px"
         bg={cardBg}
-        borderColor={borderColor}
         boxShadow="md"
         borderRadius="lg"
+        borderColor={borderColor}
       >
-        <CardHeader display="flex" justifyContent="space-between" alignItems="center">
-          <Text fontSize="xl" fontWeight="semibold" color={textColor}>
+        <CardHeader
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Text fontSize="xl" fontWeight="thin" color={textColor}>
             New Note
           </Text>
           <IconButton
-            icon={<XIcon />}
+            icon={<FaArrowLeft />}
             aria-label="Clear Form"
             size="sm"
+            borderRadius="full"
             onClick={clearForm}
             variant="ghost"
           />
@@ -175,11 +183,11 @@ export default function NewEntry() {
               />
               <Box
                 w="full"
-                h="400px"
+                h="250px"
                 overflow="auto"
                 border="1px solid"
                 borderColor={borderColor}
-                borderRadius="md"
+                borderRadius="lg"
                 bg={useColorModeValue("white", "gray.700")}
               >
                 <ReactQuill
@@ -188,7 +196,7 @@ export default function NewEntry() {
                   theme="snow"
                   placeholder="Start typing your content..."
                   style={{
-                    height: "100%",
+                    height: "80%",
                     borderRadius: "8px",
                     border: "none",
                   }}
@@ -203,21 +211,17 @@ export default function NewEntry() {
                   }}
                 />
               </Box>
-              <Button
+              <IconButton
                 colorScheme="green"
                 bg={buttonBg}
+                aria-label="Save Note"
                 _hover={{ bg: buttonHoverBg }}
-                borderRadius="full"
-                leftIcon={<Icon as={SaveIcon} />}
+                icon={<SaveIcon size={16} />}
                 onClick={handleSaveEntry}
-                size="lg"
+                borderRadius="full"
                 fontWeight="semibold"
-                isLoading={isLoading}
-                loadingText="Saving..."
-                aria-label="Save note"
-              >
-                Save
-              </Button>
+                size="lg"
+              />
             </VStack>
           </FormControl>
         </CardBody>

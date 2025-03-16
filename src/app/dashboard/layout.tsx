@@ -18,7 +18,16 @@ import {
   Divider,
   Spinner,
 } from "@chakra-ui/react";
-import { BiHome, BiMenuAltLeft, BiMenu, BiArchive, BiBulb, BiTrash, BiLabel, BiSolidLabel } from "react-icons/bi";
+import {
+  BiHome,
+  BiMenuAltLeft,
+  BiMenu,
+  BiArchive,
+  BiBulb,
+  BiTrash,
+  BiLabel,
+  BiSolidLabel,
+} from "react-icons/bi";
 import { FiSettings, FiLogOut } from "react-icons/fi";
 import { FaUser } from "react-icons/fa";
 import { signOut, useSession } from "next-auth/react";
@@ -63,13 +72,13 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
       <Box
         position="fixed"
         h="100vh"
-        w={sidebarWidth}
+        w={collapsed ? "88px" : "250px"} // Initial width based on collapsed state
         bg={sidebarBg}
         color={textColor}
         pr={6}
         pl={6}
         pt={6}
-        borderRight={collapsed ? "none" : "1px solid"}
+        borderRight="1px solid"
         borderColor={sidebarBorderColor}
         transition="width 0.3s ease-in-out"
         overflow="hidden"
@@ -77,6 +86,8 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
         flexDirection="column"
         justifyContent="space-between"
         zIndex="1100"
+        onMouseEnter={() => setCollapsed(false)} // Expand on hover
+        onMouseLeave={() => setCollapsed(true)} // Collapse on leave
       >
         {/* Sidebar Top */}
         <Box>
