@@ -17,10 +17,20 @@ import {
   Spinner,
   useToast,
   IconButton,
+  List,
+  ListItem,
+  ListIcon,
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { BiPlus, BiPin, BiTrash, BiEdit } from "react-icons/bi";
+import {
+  BiPlus,
+  BiPin,
+  BiTrash,
+  BiEdit,
+  BiGrid,
+  BiListOl as BiList,
+} from "react-icons/bi";
 import { useSession } from "next-auth/react";
 import { Session } from "next-auth";
 
@@ -46,6 +56,7 @@ export default function Home() {
 
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid"); // State for view mode
   const toast = useToast();
 
   const bgColor = useColorModeValue("white", "gray.900");
@@ -55,6 +66,7 @@ export default function Home() {
   const buttonBg = useColorModeValue("green.500", "green.600");
   const buttonHoverBg = useColorModeValue("green.600", "green.700");
   const cardHoverBg = useColorModeValue("gray.100", "gray.700");
+  const [isHovered, setIsHovered] = useState(false);
 
   const { data: session } = useSession() as {
     data: ExtendedSession | null;
@@ -177,87 +189,156 @@ export default function Home() {
     <Box bg={bgColor} p={8} minH="100vh">
       <Box maxW="1200px" mx="auto">
         <Flex justify="space-between" align="center" mb={8}>
-          <IconButton
-            color="white"
-            bg={buttonBg}
-            _hover={{ bg: buttonHoverBg, shadow: "lg" }}
-            onClick={() => router.push("/dashboard/create")}
-            borderRadius="full"
-            icon={<BiPlus />}
-            shadow={"xl"}
-            aria-label={"add-note"}
-          />
+          <HStack spacing={4}>
+            <IconButton
+              aria-label="Grid View"
+              icon={<BiGrid />}
+              onClick={() => setViewMode("grid")}
+              colorScheme={viewMode === "grid" ? "green" : "gray"}
+              borderRadius="full"
+            />
+            <IconButton
+              aria-label="List View"
+              icon={<BiList />}
+              onClick={() => setViewMode("list")}
+              colorScheme={viewMode === "list" ? "green" : "gray"}
+              borderRadius="full"
+            />
+          </HStack>
+          <Box
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            transition="all 0.3s ease-in-out" // Smooth transition for the entire box
+          >
+            <IconButton
+              color="white"
+              bg={buttonBg}
+              _hover={{ bg: buttonHoverBg, shadow: "lg" }}
+              onClick={() => router.push("/dashboard/create")}
+              borderRadius="full"
+              icon={!isHovered ? <BiPlus /> : undefined} // Show icon when not hovered
+              shadow={"xl"}
+              aria-label={"add-note"}
+              padding={isHovered ? "8px 20px" : "12px"} // Adjust padding for text
+              transition="padding 0.1s ease-in-out" // Smooth padding transition
+            >
+              {isHovered && (
+                <Text
+                  whiteSpace="nowrap"
+                  transition="opacity 0.3s ease-in-out"
+                  opacity={isHovered ? 1 : 0} // Fade in/out text
+                >
+                  New Note
+                </Text>
+              )}
+            </IconButton>
+          </Box>
         </Flex>
-
-        {/* <Grid
-          templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }}
-          gap={6}
-          mb={8}
-        >
-          <Card
-            bg={cardBg}
-            borderRadius="lg"
-            boxShadow="md"
-            border="1px solid"
-            borderColor={borderColor}
-          >
-            <CardHeader fontWeight="semibold" fontSize="lg" color={textColor}>
-              Total Notes Created
-            </CardHeader>
-            <CardBody>
-              <Text fontSize="3xl" fontWeight="bold" color={textColor}>
-                {notes.length}
-              </Text>
-            </CardBody>
-          </Card>
-          <Card
-            bg={cardBg}
-            borderRadius="lg"
-            boxShadow="md"
-            border="1px solid"
-            borderColor={borderColor}
-          >
-            <CardHeader fontWeight="semibold" fontSize="lg" color={textColor}>
-              Pinned Notes
-            </CardHeader>
-            <CardBody>
-              <Text fontSize="3xl" fontWeight="bold" color={textColor}>
-                {notes.filter((note) => note.pinned).length}
-              </Text>
-            </CardBody>
-          </Card>
-        </Grid> */}
 
         <Text fontSize="sm" fontWeight="thin" color={textColor} mb={4}>
           PINNED
         </Text>
-        <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6} mb={8}>
-          {notes
-            .filter((note) => note.pinned)
-            .map((note) => (
-              <Card
-                key={note._id}
-                bg={cardBg}
-                borderRadius="lg"
-                boxShadow="md"
-                border="1px solid"
-                borderColor={borderColor}
-                transition="all 0.2s"
-                _hover={{
-                  bg: cardHoverBg,
-                  transform: "scale(1.02)",
-                  boxShadow: "lg",
-                }}
-              >
-                <CardHeader
-                  fontWeight="semibold"
-                  fontSize="lg"
-                  color={textColor}
+        {viewMode === "grid" ? (
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6} mb={8}>
+            {notes
+              .filter((note) => note.pinned)
+              .map((note) => (
+                <Card
+                  key={note._id}
+                  bg={cardBg}
+                  borderRadius="lg"
+                  boxShadow="md"
+                  border="1px solid"
+                  borderColor={borderColor}
+                  transition="all 0.2s"
+                  _hover={{
+                    bg: cardHoverBg,
+                    transform: "scale(1.02)",
+                    boxShadow: "lg",
+                  }}
                 >
-                  {note.title}
-                </CardHeader>
-                <CardBody>
-                  <Text color={textColor} noOfLines={4}>
+                  <CardHeader
+                    fontWeight="semibold"
+                    fontSize="lg"
+                    color={textColor}
+                  >
+                    {note.title}
+                  </CardHeader>
+                  <CardBody>
+                    <Text color={textColor} noOfLines={4}>
+                      {stripHtml(note.content)}
+                    </Text>
+                    <Divider my={4} borderColor={borderColor} />
+                    <HStack spacing={4}>
+                      <Text fontSize="sm" color="gray.500">
+                        Created: {new Date(note.createdAt).toLocaleDateString()}
+                      </Text>
+                      <Text fontSize="sm" color="gray.500">
+                        Last Updated:{" "}
+                        {new Date(note.updatedAt).toLocaleDateString()}
+                      </Text>
+                    </HStack>
+                    <HStack mt={4} justifyContent="space-between">
+                      <HStack>
+                        <IconButton
+                          size="sm"
+                          variant="ghost"
+                          borderRadius="full"
+                          colorScheme="green"
+                          icon={<BiEdit />}
+                          onClick={() =>
+                            router.push(`/dashboard/edit/${note._id}`)
+                          }
+                          aria-label="View/Edit"
+                        />
+                        <IconButton
+                          size="sm"
+                          variant="ghost"
+                          borderRadius="full"
+                          colorScheme={note.pinned ? "yellow" : "gray"}
+                          icon={<BiPin />}
+                          onClick={() => handlePinNote(note._id, !note.pinned)}
+                          aria-label={note.pinned ? "Unpin" : "Pin"}
+                        />
+                        <IconButton
+                          size="sm"
+                          variant="ghost"
+                          borderRadius="full"
+                          colorScheme="red"
+                          icon={<BiTrash />}
+                          onClick={() => handleDeleteNote(note._id)}
+                          aria-label="Delete"
+                        />
+                      </HStack>
+                    </HStack>
+                  </CardBody>
+                </Card>
+              ))}
+          </SimpleGrid>
+        ) : (
+          <List spacing={4} mb={8}>
+            {notes
+              .filter((note) => note.pinned)
+              .map((note) => (
+                <ListItem
+                  key={note._id}
+                  bg={cardBg}
+                  borderRadius="lg"
+                  boxShadow="md"
+                  border="1px solid"
+                  borderColor={borderColor}
+                  p={4}
+                  transition="all 0.2s"
+                  _hover={{
+                    bg: cardHoverBg,
+                    transform: "scale(1.02)",
+                    boxShadow: "lg",
+                  }}
+                >
+                  <Text fontWeight="semibold" fontSize="lg" color={textColor}>
+                    {note.title}
+                  </Text>
+                  <Text color={textColor} noOfLines={2} mt={2}>
                     {stripHtml(note.content)}
                   </Text>
                   <Divider my={4} borderColor={borderColor} />
@@ -303,41 +384,115 @@ export default function Home() {
                       />
                     </HStack>
                   </HStack>
-                </CardBody>
-              </Card>
-            ))}
-        </SimpleGrid>
+                </ListItem>
+              ))}
+          </List>
+        )}
 
         <Text fontSize="sm" fontWeight="thin" color={textColor} mb={4}>
           OTHERS
         </Text>
-        <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6} mb={8}>
-          {notes
-            .filter((note) => !note.pinned)
-            .map((note) => (
-              <Card
-                key={note._id}
-                bg={cardBg}
-                borderRadius="lg"
-                boxShadow="md"
-                border="1px solid"
-                borderColor={borderColor}
-                transition="all 0.2s"
-                _hover={{
-                  bg: cardHoverBg,
-                  transform: "scale(1.02)",
-                  boxShadow: "lg",
-                }}
-              >
-                <CardHeader
-                  fontWeight="semibold"
-                  fontSize="lg"
-                  color={textColor}
+        {viewMode === "grid" ? (
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6} mb={8}>
+            {notes
+              .filter((note) => !note.pinned)
+              .map((note) => (
+                <Card
+                  key={note._id}
+                  bg={cardBg}
+                  borderRadius="lg"
+                  boxShadow="md"
+                  border="1px solid"
+                  borderColor={borderColor}
+                  transition="all 0.2s"
+                  _hover={{
+                    bg: cardHoverBg,
+                    transform: "scale(1.02)",
+                    boxShadow: "lg",
+                  }}
                 >
-                  {note.title}
-                </CardHeader>
-                <CardBody>
-                  <Text color={textColor} noOfLines={4}>
+                  <CardHeader
+                    fontWeight="semibold"
+                    fontSize="lg"
+                    color={textColor}
+                  >
+                    {note.title}
+                  </CardHeader>
+                  <CardBody>
+                    <Text color={textColor} noOfLines={4}>
+                      {stripHtml(note.content)}
+                    </Text>
+                    <Divider my={4} borderColor={borderColor} />
+                    <HStack spacing={4}>
+                      <Text fontSize="sm" color="gray.500">
+                        Created: {new Date(note.createdAt).toLocaleDateString()}
+                      </Text>
+                      <Text fontSize="sm" color="gray.500">
+                        Last Updated:{" "}
+                        {new Date(note.updatedAt).toLocaleDateString()}
+                      </Text>
+                    </HStack>
+                    <HStack mt={4} justifyContent="space-between">
+                      <HStack>
+                        <IconButton
+                          size="sm"
+                          variant="ghost"
+                          borderRadius="full"
+                          colorScheme="green"
+                          icon={<BiEdit />}
+                          onClick={() =>
+                            router.push(`/dashboard/edit/${note._id}`)
+                          }
+                          aria-label="View/Edit"
+                        />
+                        <IconButton
+                          size="sm"
+                          variant="ghost"
+                          borderRadius="full"
+                          colorScheme={note.pinned ? "yellow" : "gray"}
+                          icon={<BiPin />}
+                          onClick={() => handlePinNote(note._id, !note.pinned)}
+                          aria-label={note.pinned ? "Unpin" : "Pin"}
+                        />
+                        <IconButton
+                          size="sm"
+                          variant="ghost"
+                          borderRadius="full"
+                          colorScheme="red"
+                          icon={<BiTrash />}
+                          onClick={() => handleDeleteNote(note._id)}
+                          aria-label="Delete"
+                        />
+                      </HStack>
+                    </HStack>
+                  </CardBody>
+                </Card>
+              ))}
+          </SimpleGrid>
+        ) : (
+          <List spacing={4} mb={8}>
+            {notes
+              .filter((note) => !note.pinned)
+              .map((note) => (
+                <ListItem
+                  key={note._id}
+                  bg={cardBg}
+                  borderRadius="lg"
+                  boxShadow="md"
+                  border="1px solid"
+                  borderColor={borderColor}
+                  p={4}
+                  transition="all 0.2s"
+                  _hover={{
+                    bg: cardHoverBg,
+                    transform: "scale(1.02)",
+                    boxShadow: "lg",
+                  }}
+                >
+                  <Text fontWeight="semibold" fontSize="lg" color={textColor}>
+                    {note.title}
+                  </Text>
+                  <Text color={textColor} noOfLines={2} mt={2}>
                     {stripHtml(note.content)}
                   </Text>
                   <Divider my={4} borderColor={borderColor} />
@@ -383,10 +538,10 @@ export default function Home() {
                       />
                     </HStack>
                   </HStack>
-                </CardBody>
-              </Card>
-            ))}
-        </SimpleGrid>
+                </ListItem>
+              ))}
+          </List>
+        )}
       </Box>
     </Box>
   );
