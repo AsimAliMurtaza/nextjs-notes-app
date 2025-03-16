@@ -18,14 +18,16 @@ import {
   Divider,
   Spinner,
 } from "@chakra-ui/react";
-import { BiHome, BiMenuAltLeft, BiMenu, BiArchive } from "react-icons/bi";
+import { BiHome, BiMenuAltLeft, BiMenu, BiArchive, BiBulb, BiTrash, BiLabel, BiSolidLabel } from "react-icons/bi";
 import { FiSettings, FiLogOut } from "react-icons/fi";
 import { FaUser } from "react-icons/fa";
 import { signOut, useSession } from "next-auth/react";
 
 const modules = [
-  { name: "My Notes", icon: BiHome, path: "/dashboard" },
+  { name: "Notes", icon: BiBulb, path: "/dashboard" },
   { name: "Archived", icon: BiArchive, path: "/dashboard/archive" },
+  { name: "Labels", icon: BiLabel, path: "/dashboard/lables" },
+  { name: "Trash", icon: BiTrash, path: "/dashboard/trash" },
   { name: "Settings", icon: FiSettings, path: "/dashboard/settings" },
 ];
 
@@ -37,19 +39,19 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
 
   const hoverColor = useColorModeValue("green.400", "green.700");
   const textColor = useColorModeValue("gray.800", "white");
-  const sidebarBg = useColorModeValue("gray.50", "gray.900");
-
+  const sidebarBg = useColorModeValue("white", "gray.900");
+  const sidebarBorderColor = useColorModeValue("gray.200", "gray.700");
   const sidebarWidth = collapsed ? "88px" : "250px";
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/login"); // Redirect to login if not authenticated
+      router.push("/login");
     }
   }, [status, router]);
 
   if (status === "loading") {
     return (
-      <Flex justify="center" align="center" height="100vh">
+      <Flex justify="center" align="center" height="100vh" bg={sidebarBg}>
         <Spinner size="xl" />
       </Flex>
     );
@@ -64,8 +66,11 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
         w={sidebarWidth}
         bg={sidebarBg}
         color={textColor}
-        p={6}
-        borderColor={useColorModeValue("gray.200", "gray.700")}
+        pr={6}
+        pl={6}
+        pt={6}
+        borderRight={collapsed ? "none" : "1px solid"}
+        borderColor={sidebarBorderColor}
         transition="width 0.3s ease-in-out"
         overflow="hidden"
         display="flex"
@@ -78,7 +83,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
           {/* Toggle Button */}
           <Flex justify="space-between" align="center" mb={8}>
             {!collapsed && (
-              <Text fontSize="2xl" fontWeight="thin">
+              <Text fontSize="2xl" fontWeight="semibold">
                 Notes
               </Text>
             )}
@@ -112,7 +117,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
         {/* User Profile Section */}
         {session && (
           <Box mt="auto">
-            <Divider mb={4} />
+            <Divider mb={4} borderColor={sidebarBorderColor} />
             <Menu>
               <MenuButton w="full">
                 <Flex zIndex={1200} align="center" p={2}>
@@ -124,14 +129,25 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
                   )}
                 </Flex>
               </MenuButton>
-              <MenuList zIndex={1200}>
+              <MenuList
+                zIndex={1200}
+                bg={useColorModeValue("white", "gray.800")}
+                borderColor={sidebarBorderColor}
+              >
                 <MenuItem
                   icon={<FaUser />}
                   onClick={() => router.push("/dashboard/profile")}
+                  bg={useColorModeValue("white", "gray.800")}
+                  _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
                 >
                   Profile
                 </MenuItem>
-                <MenuItem icon={<FiLogOut />} onClick={() => signOut()}>
+                <MenuItem
+                  icon={<FiLogOut />}
+                  onClick={() => signOut()}
+                  bg={useColorModeValue("white", "gray.800")}
+                  _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
+                >
                   Logout
                 </MenuItem>
               </MenuList>
@@ -147,6 +163,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
         ml={sidebarWidth}
         transition="margin-left 0.3s ease-in-out"
         overflowY="auto"
+        bg={useColorModeValue("gray.100", "gray.900")}
       >
         {children}
       </Box>
@@ -170,18 +187,30 @@ const NavItem = ({
   onClick: () => void;
   collapsed: boolean;
 }) => {
+  const itemBg = useColorModeValue(
+    isActive ? "green.100" : "transparent",
+    isActive ? "green.800" : "transparent"
+  );
+  const itemColor = useColorModeValue(
+    isActive ? "green.700" : "inherit",
+    isActive ? "green.200" : "inherit"
+  );
+  const itemHoverBg = useColorModeValue(hoverColor, hoverColor);
+  const itemHoverColor = useColorModeValue("white", "white");
+
   return (
     <Tooltip label={collapsed ? label : ""} placement="right">
       <Flex
         align="center"
         w="full"
-        borderRadius="50"
+        borderRightRadius={collapsed ? "full" : "full"}
+        borderLeftRadius={!collapsed ? "none" : "full"}
         cursor="pointer"
-        bg={isActive ? "green.500" : "transparent"}
-        color={isActive ? "white" : "inherit"}
+        bg={itemBg}
+        color={itemColor}
         _hover={{
-          bg: hoverColor,
-          color: "white",
+          bg: itemHoverBg,
+          color: itemHoverColor,
           transform: "scale(1.02)",
           transition: "0.2s",
         }}

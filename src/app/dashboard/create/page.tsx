@@ -16,9 +16,14 @@ import {
   Icon,
   VStack,
   useToast,
+  Divider,
+  Skeleton,
+  IconButton,
 } from "@chakra-ui/react";
-import { SaveIcon } from "lucide-react";
+import { SaveIcon, XIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
+import "react-quill/dist/quill.snow.css";
+import { Session } from "next-auth";
 
 interface SessionWithId extends Session {
   user: {
@@ -29,33 +34,35 @@ interface SessionWithId extends Session {
   };
 }
 
-// Dynamically import ReactQuill with SSR disabled
 const ReactQuill = dynamic(() => import("react-quill"), {
   ssr: false,
-  loading: () => <p>Loading editor...</p>,
+  loading: () => <Skeleton height="400px" />,
 });
-import "react-quill/dist/quill.snow.css";
-import { Session } from "next-auth";
 
 export default function NewEntry() {
   const [editorContent, setEditorContent] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const toast = useToast();
-
   const { data: session, status } = useSession() as {
     data: SessionWithId | null;
     status: string;
   };
 
-  // Color mode values
-  const bgColor = useColorModeValue("gray.50", "gray.900");
+  const bgColor = useColorModeValue("gray.100", "gray.900");
   const textColor = useColorModeValue("gray.800", "gray.100");
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.600");
+  const buttonBg = useColorModeValue("green.500", "green.600");
+  const buttonHoverBg = useColorModeValue("green.600", "green.700");
 
   const handleEditorChange = (value: string) => {
     setEditorContent(value);
+  };
+
+  const clearForm = () => {
+    setTitle("");
+    setEditorContent("");
   };
 
   const handleSaveEntry = async () => {
@@ -104,10 +111,7 @@ export default function NewEntry() {
           duration: 3000,
           isClosable: true,
         });
-
-        // Clear the form after saving
-        setTitle("");
-        setEditorContent("");
+        clearForm();
       } else {
         throw new Error("Failed to save note");
       }
@@ -139,37 +143,43 @@ export default function NewEntry() {
         maxW="800px"
         bg={cardBg}
         borderColor={borderColor}
-        boxShadow="lg"
+        boxShadow="md"
+        borderRadius="lg"
       >
-        <CardHeader>
-          <Text fontSize="xl" fontWeight="bold" color={textColor}>
+        <CardHeader display="flex" justifyContent="space-between" alignItems="center">
+          <Text fontSize="xl" fontWeight="semibold" color={textColor}>
             New Note
           </Text>
+          <IconButton
+            icon={<XIcon />}
+            aria-label="Clear Form"
+            size="sm"
+            onClick={clearForm}
+            variant="ghost"
+          />
         </CardHeader>
+        <Divider borderColor={borderColor} />
         <CardBody>
           <FormControl mb={6}>
             <VStack spacing={6} align="start">
-              {/* Title Input */}
               <Input
                 type="text"
                 placeholder="Title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                borderRadius="lg"
+                borderRadius="md"
                 borderColor={borderColor}
                 _focus={{ borderColor: "blue.500", boxShadow: "sm" }}
                 fontSize="md"
                 fontWeight="medium"
               />
-
-              {/* React Quill Editor */}
               <Box
                 w="full"
                 h="400px"
                 overflow="auto"
                 border="1px solid"
                 borderColor={borderColor}
-                borderRadius="lg"
+                borderRadius="md"
                 bg={useColorModeValue("white", "gray.700")}
               >
                 <ReactQuill
@@ -193,11 +203,10 @@ export default function NewEntry() {
                   }}
                 />
               </Box>
-
-              {/* Save Button */}
               <Button
                 colorScheme="green"
-                variant="ghost"
+                bg={buttonBg}
+                _hover={{ bg: buttonHoverBg }}
                 borderRadius="full"
                 leftIcon={<Icon as={SaveIcon} />}
                 onClick={handleSaveEntry}

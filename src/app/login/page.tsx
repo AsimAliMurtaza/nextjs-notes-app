@@ -19,6 +19,8 @@ import {
   Image,
   Spinner,
   useColorModeValue,
+  HStack,
+  IconButton,
 } from "@chakra-ui/react";
 import { FcGoogle } from "react-icons/fc";
 import { FaMicrosoft, FaApple, FaSlack, FaGithub } from "react-icons/fa";
@@ -31,11 +33,12 @@ export default function LoginPage() {
   const toast = useToast();
   const router = useRouter();
 
-  // Color mode values
-  const bgColor = useColorModeValue("gray.50", "gray.900");
+  const bgColor = useColorModeValue("gray.100", "gray.900");
   const cardBgColor = useColorModeValue("white", "gray.800");
   const textColor = useColorModeValue("gray.600", "gray.200");
   const borderColor = useColorModeValue("gray.300", "gray.600");
+  const buttonBg = useColorModeValue("blue.500", "blue.600");
+  const buttonHoverBg = useColorModeValue("blue.600", "blue.700");
 
   const handleLogin = async () => {
     setLoading(true);
@@ -69,6 +72,10 @@ export default function LoginPage() {
     }
   };
 
+  const handleProviderLogin = async (provider: "google" | "microsoft" | "apple" | "slack" | "github") => {
+    await signIn(provider, { callbackUrl: "/dashboard" });
+  };
+
   return (
     <Flex
       justify="center"
@@ -87,16 +94,13 @@ export default function LoginPage() {
           boxShadow="lg"
           textAlign="center"
         >
-          {/* 🏢 Logo */}
           <Image src="/logo.svg" alt="Journal" mx="auto" h="40px" mb={4} />
 
-          {/* 📝 Heading */}
-          <Heading size="md" fontWeight="bold" color={textColor}>
+          <Heading size="md" fontWeight="semibold" color={textColor}>
             Log in to continue
           </Heading>
 
           <VStack spacing={4} align="stretch" mt={6}>
-            {/* 📨 Email Input */}
             <FormControl id="email" isRequired>
               <FormLabel fontSize="sm" color={textColor}>
                 Email
@@ -131,7 +135,9 @@ export default function LoginPage() {
 
             <Button
               onClick={handleLogin}
-              colorScheme="blue"
+              bg={buttonBg}
+              _hover={{ bg: buttonHoverBg }}
+              color="white"
               w="full"
               size="md"
               isLoading={loading}
@@ -141,7 +147,6 @@ export default function LoginPage() {
 
             <Divider borderColor={borderColor} />
 
-            {/* 🔗 Extra Links */}
             <Text fontSize="sm" color="blue.500" textAlign="center" mt={4}>
               <Button
                 variant="link"

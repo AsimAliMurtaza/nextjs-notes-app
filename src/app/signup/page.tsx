@@ -32,10 +32,12 @@ export default function SignUpPage() {
   const toast = useToast();
 
   const { colorMode, toggleColorMode } = useColorMode();
-  const bgColor = useColorModeValue("gray.50", "gray.900");
+  const bgColor = useColorModeValue("gray.100", "gray.900");
   const boxColor = useColorModeValue("white", "gray.800");
   const textColor = useColorModeValue("gray.700", "gray.200");
   const inputBgColor = useColorModeValue("white", "gray.700");
+  const buttonBg = useColorModeValue("blue.500", "blue.600");
+  const buttonHoverBg = useColorModeValue("blue.600", "blue.700");
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -88,10 +90,8 @@ export default function SignUpPage() {
             boxShadow="lg"
             textAlign="center"
           >
-            {/* 🏢 Logo */}
             <Image src="/logo.svg" alt="Journal" mx="auto" h="40px" mb={4} />
 
-            {/* 🌙 Dark Mode Toggle */}
             <IconButton
               aria-label="Toggle dark mode"
               icon={colorMode === "light" ? <FiMoon /> : <FiSun />}
@@ -102,20 +102,17 @@ export default function SignUpPage() {
               right={4}
             />
 
-            {/* 📝 Heading */}
-            <Heading size="md" fontWeight="bold" color={textColor}>
+            <Heading size="md" fontWeight="semibold" color={textColor}>
               Create your account
             </Heading>
 
             <VStack spacing={4} align="stretch" mt={6}>
-              {/* Error Message */}
               {error && (
                 <Text color="red.500" fontSize="sm" textAlign="center">
                   {error}
                 </Text>
               )}
 
-              {/* 📨 Email Input */}
               <FormControl id="email" isRequired>
                 <FormLabel fontSize="sm" color={textColor}>
                   Email
@@ -132,7 +129,6 @@ export default function SignUpPage() {
                 />
               </FormControl>
 
-              {/* 🔑 Password Input */}
               <FormControl id="password" isRequired>
                 <FormLabel fontSize="sm" color={textColor}>
                   Password
@@ -149,12 +145,11 @@ export default function SignUpPage() {
                 />
               </FormControl>
 
-              {/* 🔘 Signup Button */}
               <Button
                 onClick={handleSignup}
-                bg="blue.500"
+                bg={buttonBg}
                 color="white"
-                _hover={{ bg: "blue.600" }}
+                _hover={{ bg: buttonHoverBg }}
                 isLoading={loading}
                 w="full"
               >
@@ -163,7 +158,6 @@ export default function SignUpPage() {
 
               <Divider />
 
-              {/* 🔗 Login Redirect */}
               <Text fontSize="sm" color={textColor} textAlign="center">
                 Already have an account?{" "}
                 <Button

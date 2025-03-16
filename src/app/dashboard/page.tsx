@@ -20,7 +20,7 @@ import {
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { BiPlus } from "react-icons/bi";
+import { BiPlus, BiPin, BiTrash, BiEdit } from "react-icons/bi";
 import { useSession } from "next-auth/react";
 import { Session } from "next-auth";
 
@@ -47,20 +47,21 @@ export default function Home() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const toast = useToast();
-  // Color mode values
-  const bgColor = useColorModeValue("gray.50", "gray.900");
+
+  const bgColor = useColorModeValue("white", "gray.900");
   const textColor = useColorModeValue("gray.800", "gray.100");
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.600");
   const buttonBg = useColorModeValue("green.500", "green.600");
   const buttonHoverBg = useColorModeValue("green.600", "green.700");
+  const cardHoverBg = useColorModeValue("gray.100", "gray.700");
 
   const { data: session } = useSession() as {
     data: ExtendedSession | null;
   };
 
   const userID = session?.user?.id;
-  // Fetch all notes from the backend
+
   useEffect(() => {
     const fetchNotes = async () => {
       try {
@@ -92,7 +93,7 @@ export default function Home() {
 
   if (loading) {
     return (
-      <Flex justify="center" align="center" height="100vh">
+      <Flex justify="center" align="center" height="100vh" bg={bgColor}>
         <Spinner size="xl" />
       </Flex>
     );
@@ -100,11 +101,11 @@ export default function Home() {
 
   const stripHtml = (text: string) => {
     return text
-      .replace(/<[^>]+>/g, "") // Remove all HTML tags
-      .replace(/\s+/g, " ") // Replace multiple spaces with a single space
-      .trim(); // Trim leading and trailing spaces
+      .replace(/<[^>]+>/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
   };
-  // Function to handle note deletion
+
   const handleDeleteNote = async (noteId: string) => {
     try {
       const response = await fetch(`/api/delete-note`, {
@@ -141,7 +142,6 @@ export default function Home() {
     }
   };
 
-  // Function to handle pinning/unpinning notes
   const handlePinNote = async (noteId: string, pinned: boolean) => {
     try {
       const response = await fetch(`/api/pin-notes`, {
@@ -174,13 +174,10 @@ export default function Home() {
   };
 
   return (
-    <Box bg={bgColor} p={8}>
+    <Box bg={bgColor} p={8} minH="100vh">
       <Box maxW="1200px" mx="auto">
-        {/* Header Section */}
         <Flex justify="space-between" align="center" mb={8}>
-          <Text fontSize="2xl" fontWeight="bold" color={textColor}>
-            Recent Entries
-          </Text>
+
           <IconButton
             color="white"
             bg={buttonBg}
@@ -189,30 +186,23 @@ export default function Home() {
             borderRadius="full"
             icon={<BiPlus />}
             shadow={"lg"}
-            sx={{
-              "&:hover": {
-                transform: "scale(1.05)",
-                boxShadow: "xl",
-              },
-            }}
             aria-label={"add-note"}
           />
         </Flex>
 
-        {/* Stats Section */}
-        <Grid
+        {/* <Grid
           templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }}
           gap={6}
           mb={8}
         >
           <Card
             bg={cardBg}
-            borderRadius="2xl"
-            boxShadow="lg"
+            borderRadius="lg"
+            boxShadow="md"
             border="1px solid"
             borderColor={borderColor}
           >
-            <CardHeader fontWeight="bold" fontSize="lg" color={textColor}>
+            <CardHeader fontWeight="semibold" fontSize="lg" color={textColor}>
               Total Notes Created
             </CardHeader>
             <CardBody>
@@ -223,12 +213,12 @@ export default function Home() {
           </Card>
           <Card
             bg={cardBg}
-            borderRadius="2xl"
-            boxShadow="lg"
+            borderRadius="lg"
+            boxShadow="md"
             border="1px solid"
             borderColor={borderColor}
           >
-            <CardHeader fontWeight="bold" fontSize="lg" color={textColor}>
+            <CardHeader fontWeight="semibold" fontSize="lg" color={textColor}>
               Pinned Notes
             </CardHeader>
             <CardBody>
@@ -237,11 +227,10 @@ export default function Home() {
               </Text>
             </CardBody>
           </Card>
-        </Grid>
+        </Grid> */}
 
-        {/* Pinned Notes Section */}
-        <Text fontSize="xl" fontWeight="bold" color={textColor} mb={4}>
-          Pinned Notes
+        <Text fontSize="sm" fontWeight="thin" color={textColor} mb={4}>
+          PINNED
         </Text>
         <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6} mb={8}>
           {notes
@@ -250,14 +239,22 @@ export default function Home() {
               <Card
                 key={note._id}
                 bg={cardBg}
-                borderRadius="2xl"
-                boxShadow="lg"
+                borderRadius="lg"
+                boxShadow="md"
                 border="1px solid"
                 borderColor={borderColor}
                 transition="all 0.2s"
-                _hover={{ transform: "scale(1.02)", shadow: "xl" }}
+                _hover={{
+                  bg: cardHoverBg,
+                  transform: "scale(1.02)",
+                  boxShadow: "lg",
+                }}
               >
-                <CardHeader fontWeight="bold" fontSize="lg" color={textColor}>
+                <CardHeader
+                  fontWeight="semibold"
+                  fontSize="lg"
+                  color={textColor}
+                >
                   {note.title}
                 </CardHeader>
                 <CardBody>
@@ -274,43 +271,46 @@ export default function Home() {
                       {new Date(note.updatedAt).toLocaleDateString()}
                     </Text>
                   </HStack>
-                  <HStack mt={4}>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      borderRadius="full"
-                      colorScheme="green"
-                      onClick={() => router.push(`/dashboard/edit/${note._id}`)}
-                    >
-                      View/Edit
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      borderRadius="full"
-                      colorScheme={note.pinned ? "yellow" : "gray"}
-                      onClick={() => handlePinNote(note._id, !note.pinned)}
-                    >
-                      {note.pinned ? "Unpin" : "Pin"}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      borderRadius="full"
-                      colorScheme="red"
-                      onClick={() => handleDeleteNote(note._id)}
-                    >
-                      Delete
-                    </Button>
+                  <HStack mt={4} justifyContent="space-between">
+                    <HStack>
+                      <IconButton
+                        size="sm"
+                        variant="ghost"
+                        borderRadius="full"
+                        colorScheme="green"
+                        icon={<BiEdit />}
+                        onClick={() =>
+                          router.push(`/dashboard/edit/${note._id}`)
+                        }
+                        aria-label="View/Edit"
+                      />
+                      <IconButton
+                        size="sm"
+                        variant="ghost"
+                        borderRadius="full"
+                        colorScheme={note.pinned ? "yellow" : "gray"}
+                        icon={<BiPin />}
+                        onClick={() => handlePinNote(note._id, !note.pinned)}
+                        aria-label={note.pinned ? "Unpin" : "Pin"}
+                      />
+                      <IconButton
+                        size="sm"
+                        variant="ghost"
+                        borderRadius="full"
+                        colorScheme="red"
+                        icon={<BiTrash />}
+                        onClick={() => handleDeleteNote(note._id)}
+                        aria-label="Delete"
+                      />
+                    </HStack>
                   </HStack>
                 </CardBody>
               </Card>
             ))}
         </SimpleGrid>
 
-        {/* All Notes Section */}
-        <Text fontSize="xl" fontWeight="bold" color={textColor} mb={4}>
-          All Notes
+        <Text fontSize="sm" fontWeight="thin" color={textColor} mb={4}>
+          OTHERS
         </Text>
         <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6} mb={8}>
           {notes
@@ -319,14 +319,22 @@ export default function Home() {
               <Card
                 key={note._id}
                 bg={cardBg}
-                borderRadius="2xl"
-                boxShadow="lg"
+                borderRadius="lg"
+                boxShadow="md"
                 border="1px solid"
                 borderColor={borderColor}
                 transition="all 0.2s"
-                _hover={{ transform: "scale(1.02)", shadow: "xl" }}
+                _hover={{
+                  bg: cardHoverBg,
+                  transform: "scale(1.02)",
+                  boxShadow: "lg",
+                }}
               >
-                <CardHeader fontWeight="bold" fontSize="lg" color={textColor}>
+                <CardHeader
+                  fontWeight="semibold"
+                  fontSize="lg"
+                  color={textColor}
+                >
                   {note.title}
                 </CardHeader>
                 <CardBody>
@@ -343,34 +351,38 @@ export default function Home() {
                       {new Date(note.updatedAt).toLocaleDateString()}
                     </Text>
                   </HStack>
-                  <HStack mt={4}>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      borderRadius="full"
-                      colorScheme="green"
-                      onClick={() => router.push(`/dashboard/edit/${note._id}`)}
-                    >
-                      View/Edit
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      borderRadius="full"
-                      colorScheme={note.pinned ? "yellow" : "gray"}
-                      onClick={() => handlePinNote(note._id, !note.pinned)}
-                    >
-                      {note.pinned ? "Unpin" : "Pin"}
-                    </Button>
-                    <Button
-                      size="sm"
-                      colorScheme="red"
-                      variant="ghost"
-                      borderRadius="full"
-                      onClick={() => handleDeleteNote(note._id)}
-                    >
-                      Delete
-                    </Button>
+                  <HStack mt={4} justifyContent="space-between">
+                    <HStack>
+                      <IconButton
+                        size="sm"
+                        variant="ghost"
+                        borderRadius="full"
+                        colorScheme="green"
+                        icon={<BiEdit />}
+                        onClick={() =>
+                          router.push(`/dashboard/edit/${note._id}`)
+                        }
+                        aria-label="View/Edit"
+                      />
+                      <IconButton
+                        size="sm"
+                        variant="ghost"
+                        borderRadius="full"
+                        colorScheme={note.pinned ? "yellow" : "gray"}
+                        icon={<BiPin />}
+                        onClick={() => handlePinNote(note._id, !note.pinned)}
+                        aria-label={note.pinned ? "Unpin" : "Pin"}
+                      />
+                      <IconButton
+                        size="sm"
+                        variant="ghost"
+                        borderRadius="full"
+                        colorScheme="red"
+                        icon={<BiTrash />}
+                        onClick={() => handleDeleteNote(note._id)}
+                        aria-label="Delete"
+                      />
+                    </HStack>
                   </HStack>
                 </CardBody>
               </Card>
