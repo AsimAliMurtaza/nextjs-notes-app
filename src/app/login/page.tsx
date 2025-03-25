@@ -17,18 +17,12 @@ import {
   Container,
   Flex,
   Image,
-  Spinner,
   useColorModeValue,
-  HStack,
-  IconButton,
 } from "@chakra-ui/react";
-import { FcGoogle } from "react-icons/fc";
-import { FaMicrosoft, FaApple, FaSlack, FaGithub } from "react-icons/fa";
 
 export default function LoginPage() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [userExists, setUserExists] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const toast = useToast();
   const router = useRouter();
@@ -70,10 +64,6 @@ export default function LoginPage() {
         isClosable: true,
       });
     }
-  };
-
-  const handleProviderLogin = async (provider: "google" | "microsoft" | "apple" | "slack" | "github") => {
-    await signIn(provider, { callbackUrl: "/dashboard" });
   };
 
   return (
@@ -152,7 +142,7 @@ export default function LoginPage() {
                 variant="link"
                 onClick={() => router.push("/forgot-password")}
               >
-                Can't log in?
+                Can&apos;t log in?
               </Button>{" "}
               •{" "}
               <Button variant="link" onClick={() => router.push("/signup")}>

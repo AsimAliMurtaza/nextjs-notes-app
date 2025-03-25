@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import {
   Box,
-  Button,
   Card,
   CardBody,
   CardHeader,
@@ -13,14 +12,13 @@ import {
   Text,
   Flex,
   useColorModeValue,
-  Icon,
   VStack,
   useToast,
   Divider,
   Skeleton,
   IconButton,
 } from "@chakra-ui/react";
-import { SaveIcon, XIcon } from "lucide-react";
+import { SaveIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import "react-quill/dist/quill.snow.css";
 import { Session } from "next-auth";
@@ -129,6 +127,7 @@ export default function NewEntry() {
         isClosable: true,
       });
     } finally {
+      console.log(isLoading);
       setIsLoading(false);
     }
   };

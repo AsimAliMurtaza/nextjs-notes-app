@@ -19,20 +19,24 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import {
-  BiHome,
   BiMenuAltLeft,
   BiMenu,
   BiArchive,
   BiBulb,
   BiTrash,
   BiLabel,
-  BiSolidLabel,
 } from "react-icons/bi";
 import { FiSettings, FiLogOut } from "react-icons/fi";
 import { FaUser } from "react-icons/fa";
 import { signOut, useSession } from "next-auth/react";
 
-const modules = [
+interface ModuleItem {
+  name: string;
+  icon: React.ComponentType<{ size?: number }>;
+  path: string;
+}
+
+const modules: ModuleItem[] = [
   { name: "Notes", icon: BiBulb, path: "/dashboard" },
   { name: "Archived", icon: BiArchive, path: "/dashboard/archive" },
   { name: "Labels", icon: BiLabel, path: "/dashboard/lables" },
@@ -50,6 +54,10 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
   const textColor = useColorModeValue("gray.800", "white");
   const sidebarBg = useColorModeValue("white", "gray.900");
   const sidebarBorderColor = useColorModeValue("gray.200", "gray.700");
+  const menuBg = useColorModeValue("white", "gray.800");
+  const menuHoverBg = useColorModeValue("gray.100", "gray.700");
+  const menuListBg = useColorModeValue("white", "gray.800");
+  const mainBg = useColorModeValue("gray.100", "gray.900");
   const sidebarWidth = collapsed ? "88px" : "250px";
 
   useEffect(() => {
@@ -72,7 +80,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
       <Box
         position="fixed"
         h="100vh"
-        w={collapsed ? "88px" : "250px"} // Initial width based on collapsed state
+        w={collapsed ? "88px" : "250px"}
         bg={sidebarBg}
         color={textColor}
         pr={6}
@@ -86,8 +94,8 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
         flexDirection="column"
         justifyContent="space-between"
         zIndex="1100"
-        onMouseEnter={() => setCollapsed(false)} // Expand on hover
-        onMouseLeave={() => setCollapsed(true)} // Collapse on leave
+        onMouseEnter={() => setCollapsed(false)}
+        onMouseLeave={() => setCollapsed(true)}
       >
         {/* Sidebar Top */}
         <Box>
@@ -142,22 +150,22 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
               </MenuButton>
               <MenuList
                 zIndex={1200}
-                bg={useColorModeValue("white", "gray.800")}
+                bg={menuListBg}
                 borderColor={sidebarBorderColor}
               >
                 <MenuItem
                   icon={<FaUser />}
                   onClick={() => router.push("/dashboard/profile")}
-                  bg={useColorModeValue("white", "gray.800")}
-                  _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
+                  bg={menuBg}
+                  _hover={{ bg: menuHoverBg }}
                 >
                   Profile
                 </MenuItem>
                 <MenuItem
                   icon={<FiLogOut />}
                   onClick={() => signOut()}
-                  bg={useColorModeValue("white", "gray.800")}
-                  _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
+                  bg={menuBg}
+                  _hover={{ bg: menuHoverBg }}
                 >
                   Logout
                 </MenuItem>
@@ -174,7 +182,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
         ml={sidebarWidth}
         transition="margin-left 0.3s ease-in-out"
         overflowY="auto"
-        bg={useColorModeValue("gray.100", "gray.900")}
+        bg={mainBg}
       >
         {children}
       </Box>
@@ -182,22 +190,23 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// Navigation Item Component
-const NavItem = ({
-  icon,
-  label,
-  isActive,
-  hoverColor,
-  onClick,
-  collapsed,
-}: {
-  icon: any;
+interface NavItemProps {
+  icon: React.ComponentType<{ size?: number }>;
   label: string;
   isActive: boolean;
   hoverColor: string;
   onClick: () => void;
   collapsed: boolean;
-}) => {
+}
+
+const NavItem = ({
+  icon: Icon,
+  label,
+  isActive,
+  hoverColor,
+  onClick,
+  collapsed,
+}: NavItemProps) => {
   const itemBg = useColorModeValue(
     isActive ? "green.100" : "transparent",
     isActive ? "green.800" : "transparent"
@@ -229,7 +238,7 @@ const NavItem = ({
       >
         <IconButton
           aria-label={label}
-          icon={icon({ size: 20 })}
+          icon={<Icon size={20} />}
           variant="ghost"
           color="inherit"
           _hover={{ bg: "transparent" }}

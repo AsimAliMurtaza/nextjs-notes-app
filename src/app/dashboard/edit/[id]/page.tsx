@@ -39,6 +39,7 @@ export default function EditNote({ params }: { params: { id: string } }) {
   const borderColor = useColorModeValue("gray.200", "gray.600");
   const buttonBg = useColorModeValue("green.500", "green.600");
   const buttonHoverBg = useColorModeValue("green.600", "green.700");
+  const boxBgColor = useColorModeValue("white", "gray.700");
 
   useEffect(() => {
     const fetchNote = async () => {
@@ -165,7 +166,7 @@ export default function EditNote({ params }: { params: { id: string } }) {
                 border="1px solid"
                 borderColor={borderColor}
                 borderRadius="md"
-                bg={useColorModeValue("white", "gray.700")}
+                bg={boxBgColor}
               >
                 <ReactQuill
                   value={content}
