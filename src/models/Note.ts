@@ -9,16 +9,23 @@ export interface INote extends Document {
   createdAt: Date;
   updatedAt: Date;
 }
-
 const NoteSchema: Schema = new Schema(
   {
     userID: { type: String, required: true },
     title: { type: String, required: true },
     content: { type: String, required: true },
-    pinned: { type: Boolean, default: false }, // Add this field with a default value of `false`
-  },
-  { timestamps: true } // Automatically adds `createdAt` and `updatedAt` fields
+    pinned: { type: Boolean, default: false },
+    createdAt: { type: Date, default: Date.now, immutable: true }, // `immutable: true` ensures it never changes
+    updatedAt: { type: Date, default: Date.now }, // Will be updated manually
+  }
 );
 
-export default mongoose.models.Note ||
-  mongoose.model<INote>("Note", NoteSchema);
+// Middleware to update `updatedAt` on save
+NoteSchema.pre("save", function (next) {
+  if (!this.isNew) {
+    this.updatedAt = new Date();
+  }
+  next();
+});
+
+export default mongoose.models.Note || mongoose.model<INote>("Note", NoteSchema);
