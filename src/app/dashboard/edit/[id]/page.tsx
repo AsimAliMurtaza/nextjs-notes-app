@@ -161,7 +161,7 @@ export default function EditNote({ params }: { params: { id: string } }) {
               />
               <Box
                 w="full"
-                h="260px"
+                h="60vh"
                 overflow="auto"
                 border="1px solid"
                 borderColor={borderColor}
